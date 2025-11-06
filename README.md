@@ -1,1 +1,1 @@
-# Dise-o-gestion-hotelera-Alpine
+Gestion-hotelera-Alpine
