@@ -2,26 +2,19 @@ package org.TPDesarrollo.DTOs;
 
 import org.TPDesarrollo.Clases.Direccion;
 
-/**
- * DTO de Direccion
- */
-
 public class DireccionDTO {
-    //Atributos
     private String pais;
     private String provincia;
     private String localidad;
     private String calle;
-    private int numero;
+    private String numero; // <-- String para coincidir con la entidad
     private String departamento;
     private String piso;
     private String codigoPostal;
-    //Constructor
-    public DireccionDTO() {
 
-    }
-    //Constructor con parametros
-    public DireccionDTO(String pais, String provincia, String localidad, String calle, int numero, String departamento, String piso, String codigoPostal) {
+    public DireccionDTO() {}
+
+    public DireccionDTO(String pais, String provincia, String localidad, String calle, String numero, String departamento, String piso, String codigoPostal) {
         this.pais = pais;
         this.provincia = provincia;
         this.localidad = localidad;
@@ -31,8 +24,9 @@ public class DireccionDTO {
         this.piso = piso;
         this.codigoPostal = codigoPostal;
     }
-    //Constructor que recibe una direccion
+
     public DireccionDTO(Direccion direccion) {
+        if (direccion == null) return;
         this.pais = direccion.getPais();
         this.provincia = direccion.getProvincia();
         this.localidad = direccion.getLocalidad();
@@ -42,55 +36,23 @@ public class DireccionDTO {
         this.piso = direccion.getPiso();
         this.codigoPostal = direccion.getCodigoPostal();
     }
-    //Getters y Setters
-    public int getNumero() {
-        return numero;
-    }
-    public String getPais() {
-        return pais;
-    }
-    public String getProvincia() {
-        return provincia;
-    }
-    public String getLocalidad() {
-        return localidad;
-    }
-    public String getCalle() {
-        return calle;
-    }
-    public String getDepartamento() {
-        return departamento;
-    }
-    public String getPiso() {
-        return piso;
-    }
-    public String getCodigoPostal() {
-        return codigoPostal;
-    }
-    public int setNumero(int numero) {
-        return this.numero = numero;
-    }
-    public String setPais(String pais) {
-        return this.pais = pais;
-    }
-    public String setProvincia(String provincia) {
-        return this.provincia = provincia;
-    }
-    public String setLocalidad(String localidad) {
-        return this.localidad = localidad;
-    }
-    public String setCalle(String calle) {
-        return this.calle = calle;
-    }
-    public String setDepartamento(String departamento) {
-        return this.departamento = departamento;
-    }
-    public String setPiso(String piso) {
-        return this.piso = piso;
-    }
-    public String setCodigoPostal(String codigoPostal) {
-        return this.codigoPostal = codigoPostal;
-    }
 
+    // Getters y Setters (void)
+    public String getNumero() { return numero; }
+    public String getPais() { return pais; }
+    public String getProvincia() { return provincia; }
+    public String getLocalidad() { return localidad; }
+    public String getCalle() { return calle; }
+    public String getDepartamento() { return departamento; }
+    public String getPiso() { return piso; }
+    public String getCodigoPostal() { return codigoPostal; }
 
+    public void setNumero(String numero) { this.numero = numero; }
+    public void setPais(String pais) { this.pais = pais; }
+    public void setProvincia(String provincia) { this.provincia = provincia; }
+    public void setLocalidad(String localidad) { this.localidad = localidad; }
+    public void setCalle(String calle) { this.calle = calle; }
+    public void setDepartamento(String departamento) { this.departamento = departamento; }
+    public void setPiso(String piso) { this.piso = piso; }
+    public void setCodigoPostal(String codigoPostal) { this.codigoPostal = codigoPostal; }
 }

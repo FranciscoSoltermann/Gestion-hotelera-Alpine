@@ -3,17 +3,13 @@ package org.TPDesarrollo.DTOs;
 import org.TPDesarrollo.Enums.TipoDocumento;
 import java.time.LocalDate;
 
-/**
- * DTO para representar la información de un huésped.
- */
 public class HuespedDTO {
-    // Campos del DTO
     private Integer id;
     private String nombre;
     private String apellido;
     private String telefono;
     private TipoDocumento tipoDocumento;
-    private Integer documento;
+    private String documento; // ahora String
     private LocalDate fechaNacimiento;
     private String nacionalidad;
     private String email;
@@ -21,9 +17,10 @@ public class HuespedDTO {
     private String cuit;
     private String ocupacion;
     private String posicionIVA;
-    // Constructor vacío
+
     public HuespedDTO() {}
-    // Getters y Setters para todos los campos...
+
+    // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getNombre() { return nombre; }
@@ -34,8 +31,8 @@ public class HuespedDTO {
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public TipoDocumento getTipoDocumento() { return tipoDocumento; }
     public void setTipoDocumento(TipoDocumento tipoDocumento) { this.tipoDocumento = tipoDocumento; }
-    public Integer getDocumento() { return documento; }
-    public void setDocumento(Integer documento) { this.documento = documento; }
+    public String getDocumento() { return documento; }
+    public void setDocumento(String documento) { this.documento = documento; }
     public LocalDate getFechaNacimiento() { return fechaNacimiento; }
     public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     public String getNacionalidad() { return nacionalidad; }

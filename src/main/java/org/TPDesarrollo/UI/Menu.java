@@ -1,7 +1,9 @@
 package org.TPDesarrollo.UI;
 
-import org.TPDesarrollo.DAOImp.HuespedDAOImp;
-import org.TPDesarrollo.DAOImp.UsuarioDAOImp;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.TPDesarrollo.Excepciones.ContraseniaInvalida;
 import org.TPDesarrollo.Excepciones.UsuarioNoEncontrado;
 import org.TPDesarrollo.Gestores.GestorHuesped;
@@ -12,22 +14,22 @@ import org.TPDesarrollo.UI.acciones.BuscarHuespedUI;
 import java.io.Console;
 import java.util.Scanner;
 
-/**
- * Clase que representa el menú principal de la aplicación.
- * Permite la autenticación de usuarios y la navegación
- * por las diferentes opciones del sistema de gestión hotelera.
- * Utiliza GestorUsuario para la autenticación y GestorHuesped
- * para las operaciones relacionadas con huéspedes.
- * Implementa un bucle de menú que permite al usuario seleccionar
- * diferentes acciones hasta que decida salir.
- * Utiliza la clase Scanner para la entrada de datos desde la consola.
- */
-public class Menu {
+@Component
+public class Menu implements CommandLineRunner {
 
     private final Scanner scanner = new Scanner(System.in);
-    private final GestorHuesped gestorHuesped = new GestorHuesped(new HuespedDAOImp());
-    private final GestorUsuario gestorUsuario = new GestorUsuario(new UsuarioDAOImp());
-    // Método para iniciar el menú
+
+    @Autowired
+    private GestorHuesped gestorHuesped;
+
+    @Autowired
+    private GestorUsuario gestorUsuario;
+
+    @Override
+    public void run(String... args) throws Exception {
+        iniciar();
+    }
+
     public void iniciar() {
         if (autenticar()) {
             System.out.println("\nCargando menú principal del sistema...");
@@ -35,7 +37,7 @@ public class Menu {
         }
         scanner.close();
     }
-    // Método para autenticar al usuario
+
     private boolean autenticar() {
         System.out.println("=== BIENVENIDO AL SISTEMA DE GESTIÓN HOTELERA ===");
         Console console = System.console();
@@ -61,7 +63,7 @@ public class Menu {
             }
         }
     }
-    // Método para mostrar el menú principal y manejar las opciones del usuario
+
     private void mostrarMenuPrincipal() {
         int opcion;
         do {
@@ -95,7 +97,7 @@ public class Menu {
 
             } catch (NumberFormatException e) {
                 System.out.println("Entrada no válida. Por favor, ingrese un número.");
-                opcion = -1; // Para que el bucle continúe
+                opcion = -1;
             }
         } while (opcion != 0);
     }

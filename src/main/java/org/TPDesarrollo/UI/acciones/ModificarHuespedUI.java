@@ -13,24 +13,19 @@ import java.util.Scanner;
 
 /**
  * Interfaz de usuario para modificar los datos de un huésped existente.
- * Permite al usuario actualizar los campos deseados y confirmar los cambios.
- * Basado en el Caso de Uso 10.
- * Implementa la interfaz AccionMenu para integrarse con el sistema de menús.
- * Utiliza GestorHuesped para las operaciones de negocio relacionadas con huéspedes.
- * Utiliza HuespedUIUtils para utilidades relacionadas con la entrada de datos de huéspedes.
  */
 public class ModificarHuespedUI implements AccionMenu {
 
     private final Scanner scanner;
     private final GestorHuesped gestorHuesped;
     private final HuespedDTO huespedOriginal;
-    // Constructor que recibe el Scanner, el GestorHuesped y el DTO del huésped a modificar
+
     public ModificarHuespedUI(Scanner scanner, GestorHuesped gestorHuesped, HuespedDTO huespedOriginal) {
         this.scanner = scanner;
         this.gestorHuesped = gestorHuesped;
         this.huespedOriginal = huespedOriginal;
     }
-    // Método principal para ejecutar la acción de modificar un huésped
+
     @Override
     public void ejecutar() {
         System.out.println("\n--- CASO DE USO 10: MODIFICAR HUÉSPED ---");
@@ -63,7 +58,8 @@ public class ModificarHuespedUI implements AccionMenu {
             System.out.println("❌ Modificación cancelada.");
         }
     }
-    // Métodos privados para llenar los diferentes bloques de datos
+
+    // Datos personales
     private void llenarDatosPersonales(HuespedDTO huesped) {
         System.out.println("\n[DATOS PERSONALES]");
         huesped.setNombre(ConsolaUtils.leerStringLetras(" - Nombres", huesped.getNombre(), false, scanner));
@@ -72,7 +68,8 @@ public class ModificarHuespedUI implements AccionMenu {
         huesped.setEmail(ConsolaUtils.leerString(" - Email", huesped.getEmail(), true, scanner));
         huesped.setNacionalidad(ConsolaUtils.leerStringLetras(" - Nacionalidad", huesped.getNacionalidad(), false, scanner));
     }
-    // Llenar datos de identificación
+
+    // Datos de identificación
     private void llenarDatosIdentificacion(HuespedDTO huesped) {
         System.out.println("\n[DATOS DE IDENTIFICACIÓN]");
         huesped.setFechaNacimiento(ConsolaUtils.leerLocalDate(" - Fecha Nacimiento", huesped.getFechaNacimiento(), scanner));
@@ -80,32 +77,52 @@ public class ModificarHuespedUI implements AccionMenu {
         // Manejo del Enum TipoDocumento
         String tiposValidos = Arrays.toString(TipoDocumento.values());
         String tipoDocActual = huesped.getTipoDocumento() != null ? huesped.getTipoDocumento().name() : "";
-        String nuevoTipoDocStr = ConsolaUtils.leerString(" - Tipo Documento " + tiposValidos, tipoDocActual, false, scanner);
-        if (!nuevoTipoDocStr.equals(tipoDocActual)) {
+        String nuevoTipoDocStr = ConsolaUtils.leerString(" - Tipo Documento " + tiposValidos, tipoDocActual, false, scanner).trim();
+
+        if (!nuevoTipoDocStr.isEmpty() && !nuevoTipoDocStr.equals(tipoDocActual)) {
             try {
-                huesped.setTipoDocumento(TipoDocumento.valueOf(nuevoTipoDocStr.toUpperCase().trim()));
+                huesped.setTipoDocumento(TipoDocumento.valueOf(nuevoTipoDocStr.toUpperCase()));
             } catch (IllegalArgumentException e) {
                 System.err.println("❌ Tipo de documento inválido. Se mantiene el valor original: " + tipoDocActual);
             }
         }
 
-        huesped.setDocumento(ConsolaUtils.leerInteger(" - Número Documento", huesped.getDocumento(), scanner));
-        huesped.setCuit(ConsolaUtils.leerString(" - CUIT", huesped.getCuit(), true, scanner));
+        // Documento es String en el DTO: usamos leerString para permitir dejar en blanco
+        String documentoActual = huesped.getDocumento();
+        String nuevoDocumento = ConsolaUtils.leerString(" - Número Documento", documentoActual, false, scanner);
+        huesped.setDocumento((nuevoDocumento == null || nuevoDocumento.isBlank()) ? documentoActual : nuevoDocumento);
+
+        // CUIT
+        String cuitActual = huesped.getCuit();
+        String nuevoCuit = ConsolaUtils.leerString(" - CUIT", cuitActual, true, scanner);
+        huesped.setCuit((nuevoCuit == null || nuevoCuit.isBlank()) ? cuitActual : nuevoCuit);
     }
-    // Llenar datos laborales/fiscales
+
+    // Datos laborales / fiscales
     private void llenarDatosLaborales(HuespedDTO huesped) {
         System.out.println("\n[DATOS LABORALES/FISCALES]");
-        huesped.setOcupacion(ConsolaUtils.leerString(" - Ocupación", huesped.getOcupacion(), false, scanner));
-        huesped.setPosicionIVA(ConsolaUtils.leerString(" - Posición IVA", huesped.getPosicionIVA(), true, scanner));
+        String ocupacionActual = huesped.getOcupacion();
+        String nuevaOcupacion = ConsolaUtils.leerString(" - Ocupación", ocupacionActual, false, scanner);
+        huesped.setOcupacion((nuevaOcupacion == null || nuevaOcupacion.isBlank()) ? ocupacionActual : nuevaOcupacion);
+
+        String posIvaActual = huesped.getPosicionIVA();
+        String nuevaPosIva = ConsolaUtils.leerString(" - Posición IVA", posIvaActual, true, scanner);
+        huesped.setPosicionIVA((nuevaPosIva == null || nuevaPosIva.isBlank()) ? posIvaActual : nuevaPosIva);
     }
-    // Llenar datos de dirección
+
+    // Datos de dirección
     private void llenarDatosDireccion(DireccionDTO direccion) {
         System.out.println("\n[DATOS DE DIRECCIÓN]");
         direccion.setPais(ConsolaUtils.leerStringLetras(" - País", direccion.getPais(), false, scanner));
         direccion.setProvincia(ConsolaUtils.leerStringLetras(" - Provincia", direccion.getProvincia(), false, scanner));
         direccion.setLocalidad(ConsolaUtils.leerStringLetras(" - Localidad", direccion.getLocalidad(), false, scanner));
         direccion.setCalle(ConsolaUtils.leerString(" - Calle", direccion.getCalle(), false, scanner));
-        direccion.setNumero(ConsolaUtils.leerInteger(" - Número", direccion.getNumero(), scanner));
+
+        // Número es String en DTO -> usar leerString y mantener valor si queda vacío
+        String numeroActual = direccion.getNumero();
+        String nuevoNumero = ConsolaUtils.leerString(" - Número", numeroActual, false, scanner);
+        direccion.setNumero((nuevoNumero == null || nuevoNumero.isBlank()) ? numeroActual : nuevoNumero);
+
         direccion.setPiso(ConsolaUtils.leerString(" - Piso", direccion.getPiso(), true, scanner));
         direccion.setDepartamento(ConsolaUtils.leerString(" - Departamento", direccion.getDepartamento(), true, scanner));
         direccion.setCodigoPostal(ConsolaUtils.leerString(" - Código Postal", direccion.getCodigoPostal(), false, scanner));

@@ -3,30 +3,22 @@ package org.TPDesarrollo.UI.acciones;
 import org.TPDesarrollo.DTOs.HuespedDTO;
 import org.TPDesarrollo.Gestores.GestorHuesped;
 import org.TPDesarrollo.UI.AccionMenu;
-import org.TPDesarrollo.UI.HuespedUIUtils; // Asegúrate que este import esté
+import org.TPDesarrollo.UI.HuespedUIUtils;
 
 import java.util.List;
-import java.util.Scanner;
 import java.util.Optional;
+import java.util.Scanner;
 
-/**
- * Clase que implementa la acción de buscar huéspedes en el sistema.
- * Permite al usuario ingresar criterios de búsqueda y maneja los resultados.
- * Si no se encuentran huéspedes, ofrece la opción de dar de alta uno nuevo.
- * Si se encuentran huéspedes, permite seleccionar uno para ver más opciones.
- * Utiliza GestorHuesped para las operaciones de negocio relacionadas con huéspedes.
- * Implementa la interfaz AccionMenu para integrarse con el sistema de menús.
- */
 public class BuscarHuespedUI implements AccionMenu {
 
     private final Scanner scanner;
     private final GestorHuesped gestorHuesped;
-    // Constructor que recibe el Scanner y el GestorHuesped
+
     public BuscarHuespedUI(Scanner scanner, GestorHuesped gestorHuesped) {
         this.scanner = scanner;
         this.gestorHuesped = gestorHuesped;
     }
-    // Método principal para ejecutar la acción de buscar huéspedes
+
     @Override
     public void ejecutar() {
         System.out.println("\n--- CASO DE USO 02: BUSCAR HUÉSPED ---");
@@ -38,26 +30,24 @@ public class BuscarHuespedUI implements AccionMenu {
 
         System.out.print("Nombres: ");
         String nombre = scanner.nextLine().trim();
-        if ("0".equals(nombre)) return; // Corregido: antes comprobaba 'apellido' de nuevo
+        if ("0".equals(nombre)) return;
 
-        System.out.print("Tipo Documento (DNI/PASAPORTE/LC/LE): ");
+        System.out.print("Tipo Documento (DNI/PASAPORTE/LC/LE/OTRO): ");
         String tipoDoc = scanner.nextLine().trim();
-        if ("0".equals(tipoDoc)) return; // Corregido
+        if ("0".equals(tipoDoc)) return;
 
         System.out.print("Número Documento: ");
         String entradaDocumento = scanner.nextLine().trim();
-        if ("0".equals(entradaDocumento)) return; // Corregido
+        if ("0".equals(entradaDocumento)) return;
 
-        Integer documento = null;
-        if (!entradaDocumento.isEmpty()) {
-            try {
-                documento = Integer.parseInt(entradaDocumento);
-            } catch (NumberFormatException e) {
-                System.err.println("Advertencia: El número de documento no es un número válido y será ignorado.");
-            }
-        }
+        String documentoForSearch = entradaDocumento.isEmpty() ? null : entradaDocumento;
 
-        List<HuespedDTO> resultados = gestorHuesped.buscarHuespedes(apellido, nombre, tipoDoc.isEmpty() ? null : tipoDoc, documento);
+        List<HuespedDTO> resultados = gestorHuesped.buscarHuespedes(
+                apellido.isEmpty() ? null : apellido,
+                nombre.isEmpty() ? null : nombre,
+                tipoDoc.isEmpty() ? null : tipoDoc,
+                documentoForSearch
+        );
 
         if (resultados.isEmpty()) {
             manejarBusquedaSinResultados();
@@ -65,25 +55,20 @@ public class BuscarHuespedUI implements AccionMenu {
             manejarBusquedaConResultados(resultados);
         }
     }
-    // Maneja el caso cuando no se encuentran resultados en la búsqueda
-    // Ofrece la opción de dar de alta un nuevo huésped
+
     private void manejarBusquedaSinResultados() {
         System.out.println("\n⚠️ No se encontraron huéspedes que coincidan con los criterios.");
         System.out.print("¿Desea dar de alta un nuevo huésped (S/N)? ");
         if (scanner.nextLine().trim().equalsIgnoreCase("S")) {
-            // Llamada correcta: Crear una instancia de AltaHuespedUI y ejecutarla
             new AltaHuespedUI(scanner, gestorHuesped).ejecutar();
         }
     }
-    // Maneja el caso cuando se encuentran resultados en la búsqueda
-    // Permite seleccionar un huésped por su ID para ver más opciones
-    // @param resultados Lista de huéspedes encontrados
+
     private void manejarBusquedaConResultados(List<HuespedDTO> resultados) {
         System.out.println("\n✅ Se encontraron " + resultados.size() + " huésped(es):");
-        // Llamada correcta: Usar el método estático de la clase de utilidades
         HuespedUIUtils.mostrarResultados(resultados);
 
-        Integer idSeleccionado = null;
+        int idSeleccionado ;
         while (true) {
             System.out.print("\nIngrese el ID del huésped para seleccionar o '0' para CANCELAR: ");
             try {
@@ -95,21 +80,18 @@ public class BuscarHuespedUI implements AccionMenu {
 
             if (idSeleccionado == 0) {
                 System.out.println("Búsqueda cancelada.");
-                return; // Salir del método
+                return;
             }
 
-            // Buscamos si el ID ingresado está en la lista de resultados
             final Integer finalId = idSeleccionado;
             Optional<HuespedDTO> huespedEncontrado = resultados.stream()
                     .filter(h -> h.getId().equals(finalId))
                     .findFirst();
 
             if (huespedEncontrado.isPresent()) {
-                // Si el ID es válido, obtenemos todos sus datos y mostramos el submenú
                 HuespedDTO dtoCompleto = gestorHuesped.obtenerHuespedSeleccionado(idSeleccionado);
-                // Llamada correcta: Crear una instancia del menú de selección y ejecutarla
                 new MenuHuespedSeleccionadoUI(scanner, gestorHuesped, dtoCompleto).ejecutar();
-                return; // Salimos después de la selección
+                return;
             } else {
                 System.out.println("❌ ERROR: ID no válido o no encontrado en la lista de resultados.");
             }

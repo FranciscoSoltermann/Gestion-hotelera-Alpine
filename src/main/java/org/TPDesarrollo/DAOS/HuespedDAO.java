@@ -1,18 +1,28 @@
 package org.TPDesarrollo.DAOS;
 
 import org.TPDesarrollo.Clases.Huesped;
+import org.TPDesarrollo.Enums.TipoDocumento;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
-/**
- * Interfaz que define las operaciones Crear, Leer, Actualizar y Borrar para la entidad Huesped.
- */
+@Repository
+public interface HuespedDAO extends JpaRepository<Huesped, Integer> {
 
-public interface HuespedDAO {
-    // Crear, Leer, Actualizar, Borrar
-    List<Huesped> buscarHuespedes(String apellido, String nombre, String tipoDoc, Integer documento);
-    Huesped obtenerHuespedPorId(Integer id);
-    void darDeAltaHuesped(Huesped huesped);
-    void modificarHuesped(Huesped huesped);
-    void darDeBajaHuesped(Integer id);
-    boolean existeHuespedConCuit(String cuit);
+    boolean existsByCuit(String cuit);
+
+    @Query("SELECT h FROM Huesped h WHERE " +
+            "(:apellido IS NULL OR LOWER(h.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))) AND " +
+            "(:nombre IS NULL OR LOWER(h.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) AND " +
+            "(:tipoDoc IS NULL OR h.tipoDocumento = :tipoDoc) AND " +
+            "(:documento IS NULL OR h.documento = :documento)")
+    List<Huesped> buscarHuespedesPorCriterios(
+            @Param("apellido") String apellido,
+            @Param("nombre") String nombre,
+            @Param("tipoDoc") TipoDocumento tipoDoc,
+            @Param("documento") String documento
+    );
 }

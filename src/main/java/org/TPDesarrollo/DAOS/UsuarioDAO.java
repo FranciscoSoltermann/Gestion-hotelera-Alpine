@@ -1,10 +1,12 @@
 package org.TPDesarrollo.DAOS;
 
-import org.TPDesarrollo.DTOs.UsuarioDTO;
+import org.TPDesarrollo.Clases.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-/**
- * Interfaz para el acceso a datos de usuarios.
- */
-public interface UsuarioDAO {
-    UsuarioDTO obtenerUsuarioPorNombre(String nombre);
+import java.util.Optional;
+
+@Repository
+public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
+    Optional<Usuario> findByNombre(String nombre);
 }
