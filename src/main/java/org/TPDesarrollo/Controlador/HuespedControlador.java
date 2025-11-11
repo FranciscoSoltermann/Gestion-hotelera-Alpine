@@ -6,6 +6,7 @@ import org.TPDesarrollo.Gestores.GestorHuesped;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,8 +20,7 @@ public class HuespedControlador {
     private GestorHuesped gestorHuesped;
 
     @PostMapping("/alta")
-    public ResponseEntity<?> crearHuesped(@RequestBody HuespedDTO huespedDTO) {
-
+    public ResponseEntity<?> crearHuesped(@Valid @RequestBody HuespedDTO huespedDTO) {
         try {
             // 3. CAMBIA "registrarHuesped" por "darDeAltaHuesped"
             Huesped huespedGuardado = gestorHuesped.darDeAltaHuesped(huespedDTO);

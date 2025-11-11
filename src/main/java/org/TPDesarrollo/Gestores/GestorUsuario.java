@@ -45,7 +45,7 @@ public class GestorUsuario {
         // 🚨 ALERTA DE SEGURIDAD: ¡Estás guardando contraseñas en texto plano!
         // Esto es muy inseguro. Deberías encriptarlas (ver nota abajo).
         nuevoUsuario.setContrasenia(datos.getContrasenia());
-        nuevoUsuario.setRol("USER"); // Asigna un rol por defecto
+        nuevoUsuario.setRol("ADMIN"); // Asigna un rol por defecto
 
         // 3. Guarda y devuelve el usuario
         return usuarioRepo.save(nuevoUsuario);
