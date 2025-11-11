@@ -1,5 +1,5 @@
 // src/main/java/org/TPDesarrollo/config/WebConfig.java
-package org.TPDesarrollo.config;
+package org.TPDesarrollo.Configuracion;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
