@@ -2,7 +2,7 @@ package org.TPDesarrollo.Controlador;
 
 import org.TPDesarrollo.Clases.Usuario;
 import org.TPDesarrollo.DTOs.UsuarioDTO; // 1. Importa y usa tu DTO
-import org.TPDesarrollo.Servicio.UsuarioServicio;
+import org.TPDesarrollo.Gestores.GestorUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;       // 2. Importa HttpStatus
 import org.springframework.http.ResponseEntity;  // 2. Importa ResponseEntity
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsuarioControlador {
 
     @Autowired
-    private UsuarioServicio usuarioServicio;
+    private GestorUsuario usuarioServicio;
 
     @PostMapping("/login")
     // 3. Acepta el DTO en lugar de la Entidad completa
@@ -33,7 +33,7 @@ public class UsuarioControlador {
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioDTO datos) {
         try {
-            // (Asegúrate que tu UsuarioServicio tenga este método)
+            // (Asegúrate que tuGestorUsuario tenga este método)
             Usuario usuarioNuevo = usuarioServicio.registrarUsuario(datos);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioNuevo);
         } catch (Exception e) {

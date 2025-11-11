@@ -1,12 +1,12 @@
 package org.TPDesarrollo.Gestores;
 
+import org.TPDesarrollo.DAOs.HuespedDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.TPDesarrollo.Clases.Direccion;
 import org.TPDesarrollo.Clases.Huesped;
-import org.TPDesarrollo.DAOS.HuespedDAO;
 import org.TPDesarrollo.DTOs.DireccionDTO;
 import org.TPDesarrollo.DTOs.HuespedDTO;
 import org.TPDesarrollo.Excepciones.CuitExistente;

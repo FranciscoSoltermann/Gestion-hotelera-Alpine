@@ -1,17 +1,13 @@
-package org.TPDesarrollo.DAOS;
+package org.TPDesarrollo.DAOs;
 
 import org.TPDesarrollo.Clases.Huesped;
-import org.TPDesarrollo.Enums.TipoDocumento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.TPDesarrollo.Enums.TipoDocumento;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
-@Repository
 public interface HuespedDAO extends JpaRepository<Huesped, Integer> {
-
     boolean existsByCuit(String cuit);
 
     @Query("SELECT h FROM Huesped h WHERE " +

@@ -8,7 +8,6 @@ import org.TPDesarrollo.Excepciones.ContraseniaInvalida;
 import org.TPDesarrollo.Excepciones.UsuarioNoEncontrado;
 import org.TPDesarrollo.Gestores.GestorHuesped;
 import org.TPDesarrollo.Gestores.GestorUsuario;
-import org.TPDesarrollo.UI.acciones.AltaHuespedUI;
 import org.TPDesarrollo.UI.acciones.BuscarHuespedUI;
 
 import java.io.Console;
@@ -38,6 +37,34 @@ public class Menu implements CommandLineRunner {
         scanner.close();
     }
 
+    private void mostrarMenuPrincipal() {
+        int opcion;
+        do {
+            System.out.println("\n--- MENÚ PRINCIPAL ---");
+            System.out.println("1. Buscar Huésped (CU02)");
+            System.out.println("0. Salir");
+            System.out.print("Seleccione una opción: ");
+
+            try {
+                opcion = Integer.parseInt(scanner.nextLine());
+                switch (opcion) {
+                    case 1:
+                        AccionMenu buscarHuespedAccion = new BuscarHuespedUI(scanner, gestorHuesped);
+                        buscarHuespedAccion.ejecutar();
+                        break;
+                    case 0:
+                        System.out.println("Saliendo del sistema. ¡Hasta luego!");
+                        break;
+                    default:
+                        System.out.println("Opción no válida. Intente de nuevo.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Por favor, ingrese un número.");
+                opcion = -1; // Para continuar el bucle
+            }
+        } while (opcion != 0);
+    }
+
     private boolean autenticar() {
         System.out.println("=== BIENVENIDO AL SISTEMA DE GESTIÓN HOTELERA ===");
         Console console = System.console();
@@ -64,41 +91,5 @@ public class Menu implements CommandLineRunner {
         }
     }
 
-    private void mostrarMenuPrincipal() {
-        int opcion;
-        do {
-            System.out.println("\n--- MENÚ PRINCIPAL ---");
-            System.out.println("1. Buscar Huésped");
-            System.out.println("2. Dar Alta Huésped");
-            System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
-
-            try {
-                opcion = Integer.parseInt(scanner.nextLine());
-                AccionMenu accion = null;
-
-                switch (opcion) {
-                    case 1:
-                        accion = new BuscarHuespedUI(scanner, gestorHuesped);
-                        break;
-                    case 2:
-                        accion = new AltaHuespedUI(scanner, gestorHuesped);
-                        break;
-                    case 0:
-                        System.out.println("Saliendo del sistema. ¡Hasta pronto!");
-                        break;
-                    default:
-                        System.out.println("Opción no válida.");
-                }
-
-                if (accion != null) {
-                    accion.ejecutar();
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.println("Entrada no válida. Por favor, ingrese un número.");
-                opcion = -1;
-            }
-        } while (opcion != 0);
-    }
+    
 }
