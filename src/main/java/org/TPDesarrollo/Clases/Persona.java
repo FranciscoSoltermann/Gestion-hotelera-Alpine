@@ -1,7 +1,7 @@
 package org.TPDesarrollo.Clases;
 
 import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
 @MappedSuperclass
 public abstract class Persona {
 
@@ -26,7 +26,7 @@ public abstract class Persona {
     @Column(name = "tipo_doc", nullable = false)
     private org.TPDesarrollo.Enums.TipoDocumento tipoDocumento;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // <-- ¡CAMBIO AQUÍ!
     @JoinColumn(name = "id_direccion")
     private Direccion direccion;
 
