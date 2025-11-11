@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepositorio extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByNombreAndContrasenia(String nombre, String contrasenia);
+    Optional<Usuario> findByNombre(String nombre);
 }

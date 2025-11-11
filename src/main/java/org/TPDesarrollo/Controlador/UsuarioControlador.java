@@ -30,4 +30,15 @@ public class UsuarioControlador {
         // 5. Si el login es exitoso, devuelve 200 OK con el objeto Usuario
         return ResponseEntity.ok(usuario);
     }
+    @PostMapping("/registrar")
+    public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioDTO datos) {
+        try {
+            // (Asegúrate que tu UsuarioServicio tenga este método)
+            Usuario usuarioNuevo = usuarioServicio.registrarUsuario(datos);
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioNuevo);
+        } catch (Exception e) {
+            // (Ej. si el nombre de usuario ya existe)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }
