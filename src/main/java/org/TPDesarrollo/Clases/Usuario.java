@@ -20,9 +20,6 @@ public class Usuario {
     @Column(name = "rol")
     private String rol;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_huesped")
-    private Huesped huesped;
 
     public Usuario() {}
 
@@ -39,6 +36,4 @@ public class Usuario {
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
 
-    public Huesped getHuesped() { return huesped; }
-    public void setHuesped(Huesped huesped) { this.huesped = huesped; }
 }

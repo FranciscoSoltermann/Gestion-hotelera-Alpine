@@ -1,6 +1,7 @@
 package org.TPDesarrollo.Gestores;
 
 import org.TPDesarrollo.DAOs.HuespedDAO;
+import org.TPDesarrollo.Excepciones.DniExistente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +60,9 @@ public class GestorHuesped {
         System.out.println("GESTOR: Solicitud para dar de alta a " + huespedDTO.getNombre());
         String cuit = huespedDTO.getCuit();
 
+        if (huespedDAO.existsByDocumento(huespedDTO.getDocumento())) {
+            throw new DniExistente("El DNI/Documento ingresado ya existe.");
+        }
         if (cuit != null && !cuit.trim().isEmpty()) {
             if (huespedDAO.existsByCuit(cuit)) {
                 throw new CuitExistente(cuit);

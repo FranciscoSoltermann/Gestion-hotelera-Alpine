@@ -22,9 +22,6 @@ public class Huesped extends Persona {
 
     private String email;
 
-    // Relacion inversa optional al Usuario
-    @OneToOne(mappedBy = "huesped", fetch = FetchType.LAZY)
-    private Usuario usuario;
 
     public Huesped() {}
 
@@ -47,6 +44,4 @@ public class Huesped extends Persona {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }
