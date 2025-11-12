@@ -115,8 +115,10 @@ public class GestorHuesped {
     private Huesped convertirA_Entidad(HuespedDTO dto) {
         Huesped entidad = new Huesped();
 
-        if (dto.getId() != null) {
-            entidad.setId(dto.getId());
+        if (dto.getCuit() == null || dto.getCuit().isBlank()) {
+            entidad.setCuit(null); // Guarda NULL en la base de datos
+        } else {
+            entidad.setCuit(dto.getCuit()); // Guarda el CUIT
         }
 
         // Seteamos los campos heredados de Persona directamente en la entidad Huesped
