@@ -1,15 +1,35 @@
 package org.TPDesarrollo.DTOs;
 
 import org.TPDesarrollo.Clases.Direccion;
+// --- IMPORTA ESTAS LIBRERÍAS ---
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class DireccionDTO {
+
+    @NotBlank(message = "El país es obligatorio")
     private String pais;
+
+    @NotBlank(message = "La provincia es obligatoria")
     private String provincia;
+
+    @NotBlank(message = "La localidad es obligatoria")
     private String localidad;
+
+    @NotBlank(message = "La calle es obligatoria")
     private String calle;
-    private String numero; // <-- String para coincidir con la entidad
+
+
+    @NotBlank(message = "El número es obligatorio")
+    @Pattern(regexp = "^[0-9]+$", message = "El número debe contener solo numeros.")
+    private String numero;
+
     private String departamento;
+
     private String piso;
+
+    // --- VALIDACIÓN PARA CÓDIGO POSTAL ---
+    @NotBlank(message = "El código postal es obligatorio")
     private String codigoPostal;
 
     public DireccionDTO() {}

@@ -1,5 +1,6 @@
 package org.TPDesarrollo.Controlador;
 
+import jakarta.validation.Valid;
 import org.TPDesarrollo.Clases.Usuario;
 import org.TPDesarrollo.DTOs.UsuarioDTO; // 1. Importa y usa tu DTO
 import org.TPDesarrollo.Gestores.GestorUsuario;
@@ -31,14 +32,18 @@ public class UsuarioControlador {
         return ResponseEntity.ok(usuario);
     }
     @PostMapping("/registrar")
-    public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioDTO datos) {
-        try {
-            // (Asegúrate que tuGestorUsuario tenga este método)
-            Usuario usuarioNuevo = usuarioServicio.registrarUsuario(datos);
-            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioNuevo);
-        } catch (Exception e) {
-            // (Ej. si el nombre de usuario ya existe)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody UsuarioDTO datos) {
+        // 1. Añadimos @Valid arriba.
+        // 2. ¡BORRAMOS EL TRY-CATCH!
+
+        // Ahora, si la validación (@ValidPassword) falla,
+        // o si registrarUsuario lanza "UsuarioExistenteException",
+        // tu GlobalExceptionHandler los atrapará automáticamente.
+
+        // (Asegúrate que tu GestorUsuario tenga este método)
+        Usuario usuarioNuevo = usuarioServicio.registrarUsuario(datos);
+
+        // Si el código llega aquí, fue un éxito.
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioNuevo);
     }
 }

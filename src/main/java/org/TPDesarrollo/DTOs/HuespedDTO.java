@@ -1,5 +1,6 @@
 package org.TPDesarrollo.DTOs;
 
+import jakarta.validation.Valid;
 import org.TPDesarrollo.Enums.TipoDocumento;
 import java.time.LocalDate;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,8 @@ public class HuespedDTO {
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*$", message = "El apellido solo puede contener letras y espacios")
     private String apellido;
 
+    @NotBlank(message = "El Telefono no puede estar vacío")
+    @Pattern(regexp = "^[0-9]{7,20}$", message = "El Telefono debe contener solo números")
     private String telefono;
 
     private TipoDocumento tipoDocumento;
@@ -41,7 +44,7 @@ public class HuespedDTO {
     private String nacionalidad;
 
     private String email;
-
+    @Valid
     private DireccionDTO direccion;
 
 
@@ -51,7 +54,7 @@ public class HuespedDTO {
 
     @NotBlank(message = "La ocupación не puede estar vacía")
     // Esta regex es similar a la de nombre/apellido
-    // ^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$ = Solo letras (con acentos, ñ) y espacios.
+    // ^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$ = Solo letras (con acentos, ñ) y espacios.
     // El '+' al final significa "uno o más caracteres"
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "La ocupación solo puede contener letras y espacios.")
     private String ocupacion;

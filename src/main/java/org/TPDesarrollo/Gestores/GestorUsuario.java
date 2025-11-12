@@ -3,6 +3,7 @@ package org.TPDesarrollo.Gestores;
 import org.TPDesarrollo.Clases.Usuario;
 import org.TPDesarrollo.DTOs.UsuarioDTO;
 import org.TPDesarrollo.DAOs.UsuarioDAO;
+import org.TPDesarrollo.Excepciones.UsuarioExistente;
 import org.TPDesarrollo.Excepciones.UsuarioNoEncontrado;
 import org.TPDesarrollo.Excepciones.ContraseniaInvalida;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,8 @@ public class GestorUsuario {
     public Usuario registrarUsuario(UsuarioDTO datos) {
         // 1. Verifica si el usuario ya existe
         if (usuarioRepo.findByNombre(datos.getNombre()).isPresent()) {
-            throw new RuntimeException("El nombre de usuario '" + datos.getNombre() + "' ya existe.");
+            // ¡Lanza la excepción específica!
+            throw new UsuarioExistente("El nombre de usuario '" + datos.getNombre() + "' ya existe.");
         }
 
         // 2. Crea el nuevo usuario

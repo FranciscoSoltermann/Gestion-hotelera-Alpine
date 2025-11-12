@@ -14,15 +14,12 @@ public class Usuario {
     @Column(name = "nombre", nullable = false, unique = true)
     private String nombre;
 
-    @Column(name = "contrasenia", nullable = false) // 👈 importante: coincide con la BD
+    @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
 
     @Column(name = "rol")
     private String rol;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_huesped")
-    private Huesped huesped;
 
     public Usuario() {}
 
@@ -39,6 +36,4 @@ public class Usuario {
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
 
-    public Huesped getHuesped() { return huesped; }
-    public void setHuesped(Huesped huesped) { this.huesped = huesped; }
 }
