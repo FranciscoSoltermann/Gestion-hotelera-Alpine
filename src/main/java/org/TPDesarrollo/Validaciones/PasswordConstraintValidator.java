@@ -60,7 +60,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
         return true; // ¡Válida!
     }
 
-    // Método privado para establecer el mensaje de error específico
+    // Método auxiliar para establecer mensajes de error personalizados
     private void setErrorMessage(ConstraintValidatorContext context, String message) {
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(message).addConstraintViolation();

@@ -14,7 +14,7 @@ public class Usuario {
     @Column(name = "nombre", nullable = false, unique = true)
     private String nombre;
 
-    @Column(name = "contrasenia", nullable = false) // 👈 importante: coincide con la BD
+    @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
 
     @Column(name = "rol")
