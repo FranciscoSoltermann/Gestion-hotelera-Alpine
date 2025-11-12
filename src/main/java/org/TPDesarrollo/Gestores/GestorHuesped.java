@@ -25,26 +25,44 @@ public class GestorHuesped {
     @Transactional(readOnly = true)
     public List<HuespedDTO> buscarHuespedes(String apellido, String nombre, String tipoDocumento, String documento) {
         System.out.println("GESTOR: Solicitud para buscar huéspedes...");
+        System.out.println("Parámetros - apellido: '" + apellido + "', nombre: '" + nombre +
+                "', tipoDocumento: '" + tipoDocumento + "', documento: '" + documento + "'");
 
-        TipoDocumento tipoDocEnum = null;
-        if (tipoDocumento != null && !tipoDocumento.isBlank()) {
-            try {
-                tipoDocEnum = TipoDocumento.valueOf(tipoDocumento.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                tipoDocEnum = null;
+        try {
+            // Manejo más robusto de parámetros
+            String apellidoParam = (apellido != null && !apellido.trim().isEmpty()) ? apellido.trim() : null;
+            String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
+            String documentoParam = (documento != null && !documento.trim().isEmpty()) ? documento.trim() : null;
+
+            TipoDocumento tipoDocEnum = null;
+            if (tipoDocumento != null && !tipoDocumento.trim().isEmpty()) {
+                try {
+                    tipoDocEnum = TipoDocumento.valueOf(tipoDocumento.trim().toUpperCase());
+                    System.out.println("Tipo documento convertido: " + tipoDocEnum);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Tipo documento inválido, se ignorará: " + tipoDocumento);
+                    // No lanzamos excepción, simplemente ignoramos este filtro
+                }
             }
+
+            List<Huesped> huespedesEncontrados = huespedDAO.buscarHuespedesPorCriterios(
+                    apellidoParam,
+                    nombreParam,
+                    tipoDocEnum,
+                    documentoParam
+            );
+
+            System.out.println("Huéspedes encontrados: " + huespedesEncontrados.size());
+
+            return huespedesEncontrados.stream()
+                    .map(this::convertirA_DTO)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            System.err.println("ERROR en GestorHuesped.buscarHuespedes: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al buscar huéspedes: " + e.getMessage(), e);
         }
-
-        List<Huesped> huespedesEncontrados = huespedDAO.buscarHuespedesPorCriterios(
-                (apellido == null || apellido.isEmpty()) ? null : apellido,
-                (nombre == null || nombre.isEmpty()) ? null : nombre,
-                tipoDocEnum,
-                (documento == null || documento.isEmpty()) ? null : documento
-        );
-
-        return huespedesEncontrados.stream()
-                .map(this::convertirA_DTO)
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

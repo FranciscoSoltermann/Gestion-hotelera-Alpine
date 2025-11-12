@@ -12,10 +12,10 @@ public interface HuespedDAO extends JpaRepository<Huesped, Integer> {
     boolean existsByDocumento(String documento);
 
     @Query("SELECT h FROM Huesped h WHERE " +
-            "(:apellido IS NULL OR LOWER(h.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))) AND " +
-            "(:nombre IS NULL OR LOWER(h.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) AND " +
+            "(:apellido IS NULL OR :apellido = '' OR LOWER(h.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))) AND " +
+            "(:nombre IS NULL OR :nombre = '' OR LOWER(h.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) AND " +
             "(:tipoDoc IS NULL OR h.tipoDocumento = :tipoDoc) AND " +
-            "(:documento IS NULL OR h.documento = :documento)")
+            "(:documento IS NULL OR :documento = '' OR h.documento = :documento)")
     List<Huesped> buscarHuespedesPorCriterios(
             @Param("apellido") String apellido,
             @Param("nombre") String nombre,
