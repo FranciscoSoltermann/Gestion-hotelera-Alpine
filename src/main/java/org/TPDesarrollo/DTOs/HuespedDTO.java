@@ -48,7 +48,7 @@ public class HuespedDTO {
     private DireccionDTO direccion;
 
 
-    @Pattern(regexp = "^[0-9]{11}$", message = "El CUIT debe contener exactamente 11 números, sin letras ni guiones.")
+    @Pattern(regexp = "^(|[0-9]{11})$", message = "El CUIT debe contener exactamente 11 números, sin letras ni guiones.")
     private String cuit;
 
 
@@ -73,7 +73,7 @@ public class HuespedDTO {
 
         // CASO 1: Si es Consumidor Final, la validación pasa.
         // No nos importa si el CUIT es nulo o no.
-        if (posicionIVA.equalsIgnoreCase("Consumidor Final")) {
+        if (posicionIVA.equalsIgnoreCase("Consumidor_Final")) {
             return true;
         }
 
