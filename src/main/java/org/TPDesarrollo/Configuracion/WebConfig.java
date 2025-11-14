@@ -1,4 +1,4 @@
-// src/main/java/org/TPDesarrollo/config/WebConfig.java
+
 package org.TPDesarrollo.Configuracion;
 
 import org.springframework.context.annotation.Configuration;
@@ -10,9 +10,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Esto le da permiso a CUALQUIER ruta en tu API
+        // Esto le da permiso a CUALQUIER ruta en la API
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000") // Permite tu front-end
+                .allowedOrigins("http://localhost:3000") //  front-end
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Permite el POST y el OPTIONS
                 .allowedHeaders("*")
                 .allowCredentials(true);

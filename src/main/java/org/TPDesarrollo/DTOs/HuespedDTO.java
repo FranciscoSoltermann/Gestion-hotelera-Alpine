@@ -28,8 +28,6 @@ public class HuespedDTO {
     private TipoDocumento tipoDocumento;
 
     @NotBlank(message = "El DNI/Documento no puede estar vacío")
-    // Esta regex ^[0-9]{7,8}$ significa:
-    // ^ = Empieza la cadena
     // [0-9] = Solo se permiten dígitos del 0 al 9
     // {7,8} = Debe tener una longitud de 7 u 8 dígitos
     // $ = Termina la cadena
@@ -54,8 +52,7 @@ public class HuespedDTO {
 
     @NotBlank(message = "La ocupación не puede estar vacía")
     // Esta regex es similar a la de nombre/apellido
-    // ^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$ = Solo letras (con acentos, ñ) y espacios.
-    // El '+' al final significa "uno o más caracteres"
+    // ^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$ = Solo letras (con acentos, ñ) y espacios
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "La ocupación solo puede contener letras y espacios.")
     private String ocupacion;
 
@@ -71,13 +68,13 @@ public class HuespedDTO {
             return true;
         }
 
-        // CASO 1: Si es Consumidor Final, la validación pasa.
+        //  Si es Consumidor Final, la validación pasa.
         // No nos importa si el CUIT es nulo o no.
         if (posicionIVA.equalsIgnoreCase("Consumidor_Final")) {
             return true;
         }
 
-        // CASO 2: Si NO es Consumidor Final (es "Responsable Inscripto", etc.),
+        //  Si NO es Consumidor Final (es "Responsable Inscripto", etc.),
         // el CUIT DEBE estar presente (no ser nulo ni estar vacío).
         return cuit != null && !cuit.isBlank();
     }

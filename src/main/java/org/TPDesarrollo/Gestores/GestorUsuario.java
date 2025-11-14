@@ -34,22 +34,21 @@ public class GestorUsuario {
         return usuarioRepo.findByNombreAndContrasenia(nombre, contrasenia).orElse(null);
     }
     public Usuario registrarUsuario(UsuarioDTO datos) {
-        // 1. Verifica si el usuario ya existe
+        //  Verifica si el usuario ya existe
         if (usuarioRepo.findByNombre(datos.getNombre()).isPresent()) {
             // ¡Lanza la excepción específica!
             throw new UsuarioExistente("El nombre de usuario '" + datos.getNombre() + "' ya existe.");
         }
 
-        // 2. Crea el nuevo usuario
+        //  Crea el nuevo usuario
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setNombre(datos.getNombre());
 
-        // 🚨 ALERTA DE SEGURIDAD: ¡Estás guardando contraseñas en texto plano!
-        // Esto es muy inseguro. Deberías encriptarlas (ver nota abajo).
+
         nuevoUsuario.setContrasenia(datos.getContrasenia());
         nuevoUsuario.setRol("ADMIN"); // Asigna un rol por defecto
 
-        // 3. Guarda y devuelve el usuario
+        //  Guarda y devuelve el usuario
         return usuarioRepo.save(nuevoUsuario);
     }
 }

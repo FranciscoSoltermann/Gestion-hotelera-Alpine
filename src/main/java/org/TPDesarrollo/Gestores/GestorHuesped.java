@@ -55,7 +55,7 @@ public class GestorHuesped {
     }
 
     @Transactional
-    // 1. CAMBIA "void" por "Huesped"
+
     public Huesped darDeAltaHuesped(HuespedDTO huespedDTO) {
         System.out.println("GESTOR: Solicitud para dar de alta a " + huespedDTO.getNombre());
         String cuit = huespedDTO.getCuit();
@@ -73,7 +73,7 @@ public class GestorHuesped {
 
         Huesped huespedEntidad = convertirA_Entidad(huespedDTO);
 
-        // 2. GUARDA Y DEVUELVE LA ENTIDAD EN UN SOLO PASO
+
         return huespedDAO.save(huespedEntidad);
     }
 

@@ -10,7 +10,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
         if (password == null || password.isEmpty()) {
-            return false; // Puedes usar @NotBlank para esto, pero es bueno tenerlo
+            return false;
         }
 
         // Extraemos letras y números
@@ -25,7 +25,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
                 .boxed()
                 .toList();
 
-        // --- 1. Revisar longitudes ---
+        // ---- Revisar longitudes ---
         if (letras.size() < 5) {
             setErrorMessage(context, "La contraseña debe tener al menos 5 letras.");
             return false;
@@ -35,13 +35,13 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
             return false;
         }
 
-        // --- 2. Revisar números idénticos (ej. "777") ---
+        // ---  Revisar números idénticos (ej. "777") ---
         if (numeros.stream().distinct().count() == 1) {
             setErrorMessage(context, "Los números no pueden ser todos iguales (ej. '333').");
             return false;
         }
 
-        // --- 3. Revisar números consecutivos (ej. "123" o "321") ---
+        // ---  Revisar números consecutivos (ej. "123" o "321") ---
         for (int i = 0; i < numeros.size() - 2; i++) {
             int n1 = numeros.get(i);
             int n2 = numeros.get(i + 1);
@@ -57,7 +57,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
             }
         }
 
-        return true; // ¡Válida!
+        return true;
     }
 
     // Método auxiliar para establecer mensajes de error personalizados

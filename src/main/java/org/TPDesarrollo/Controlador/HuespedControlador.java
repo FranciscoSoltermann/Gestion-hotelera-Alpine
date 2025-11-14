@@ -23,14 +23,14 @@ public class HuespedControlador {
     @PostMapping("/alta")
     public ResponseEntity<?> crearHuesped(@Valid @RequestBody HuespedDTO huespedDTO) {
         try {
-            // 3. CAMBIA "registrarHuesped" por "darDeAltaHuesped"
+            //
             Huesped huespedGuardado = gestorHuesped.darDeAltaHuesped(huespedDTO);
 
-            // 4. Devuelve el objeto Huesped completo. Spring lo convertirá en JSON.
+            //  Devuelve el objeto Huesped completo. Spring lo convertirá en JSON.
             return ResponseEntity.ok(huespedGuardado);
 
         } catch (Exception e) {
-            // Un buen manejo de errores por si algo falla en el gestor
+
             return ResponseEntity
                     .status(500)
                     .body("{\"error\":\"Error al registrar huesped: " + e.getMessage() + "\"}");
@@ -44,7 +44,7 @@ public class HuespedControlador {
             @RequestParam(required = false) String documento
     ) {
         try {
-            // 3. Llama al gestor que ya preparamos
+            //  Llama al gestor que ya preparamos
             List<HuespedDTO> huespedes = gestorHuesped.buscarHuespedes(
                     apellido,
                     nombre,
@@ -52,7 +52,7 @@ public class HuespedControlador {
                     documento
             );
 
-            // 4. Devuelve la lista de resultados
+            //  Devuelve la lista de resultados
             return ResponseEntity.ok(huespedes);
 
         } catch (Exception e) {
