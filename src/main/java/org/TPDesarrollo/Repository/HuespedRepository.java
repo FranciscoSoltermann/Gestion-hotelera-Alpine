@@ -1,4 +1,4 @@
-package org.TPDesarrollo.DAOs;
+package org.TPDesarrollo.Repository;
 
 import org.TPDesarrollo.Clases.Huesped;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,7 +7,7 @@ import org.TPDesarrollo.Enums.TipoDocumento;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 
-public interface HuespedDAO extends JpaRepository<Huesped, Integer> {
+public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
     boolean existsByCuit(String cuit);
     boolean existsByDocumento(String documento);
 

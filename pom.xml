@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version> <!-- Versión estable de Spring Boot -->
+        <version>3.5.0</version> <!-- Versión estable de Spring Boot -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -17,12 +17,15 @@
     <artifactId>TrabajoPractico</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+
     <properties>
-        <!-- 2. VERSIÓN DE JAVA -->
-        <!-- Cambiado de 24 a 21 para compatibilidad con Spring Boot 3.2. x -->
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <spring-framework.version>6.2.8</spring-framework.version>
+        <logback.version>1.5.20</logback.version>
     </properties>
+
 
     <dependencies>
         <!-- 3. DEPENDENCIAS (STARTERS) DE SPRING BOOT -->
@@ -69,6 +72,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Dependencia para Swagger / OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
 
         <!-- Para MySQL
         <dependency>
@@ -77,7 +86,10 @@
             <scope>runtime</scope>
         </dependency>
         -->
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <!--
          4. STARTER DE TEST (REEMPLAZA TUS DEPENDENCIAS DE JUNIT Y MOCKITO)
          Esto ya incluye JUnit 5, Mockito, AssertJ y más, todo gestionado por Spring.

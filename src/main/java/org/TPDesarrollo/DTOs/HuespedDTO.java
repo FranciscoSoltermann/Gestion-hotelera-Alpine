@@ -1,12 +1,9 @@
 package org.TPDesarrollo.DTOs;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import org.TPDesarrollo.Enums.TipoDocumento;
 import java.time.LocalDate;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.AssertTrue;
 
 public class HuespedDTO {
     private Integer id;
@@ -36,6 +33,8 @@ public class HuespedDTO {
     @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe contener solo 7 u 8 números, sin letras ni puntos.")
     private String documento;
     // ahora String
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
+    @Past(message = "La fecha de nacimiento debe ser anterior a hoy")
     private LocalDate fechaNacimiento;
 
     @NotBlank(message = "La Nacionalidad no puede estar vacío")
@@ -43,6 +42,7 @@ public class HuespedDTO {
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]*$", message = "La Nacionalidad solo puede contener letras y espacios")
     private String nacionalidad;
 
+    @Email(message = "El formato del email no es válido")
     private String email;
     @Valid
     private DireccionDTO direccion;
@@ -73,7 +73,7 @@ public class HuespedDTO {
 
         // CASO 1: Si es Consumidor Final, la validación pasa.
         // No nos importa si el CUIT es nulo o no.
-        if (posicionIVA.equalsIgnoreCase("Consumidor Final")) {
+        if (posicionIVA.equalsIgnoreCase("Consumidor_Final")) {
             return true;
         }
 

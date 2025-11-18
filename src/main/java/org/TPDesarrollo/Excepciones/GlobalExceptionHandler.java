@@ -1,4 +1,4 @@
-package org.TPDesarrollo.Excepciones; // O donde prefieras
+package org.TPDesarrollo.Excepciones;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,7 +6,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
@@ -15,50 +14,61 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Este método se activa CADA VEZ que una validación de @Valid falla
-     * en CUALQUIER controlador.
-     */
+    // 1. Manejo de Validaciones (@Valid, @NotBlank, etc.) -> Error 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST) // Responde con un 400
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-
-        // Creamos un mapa para guardar los errores: "campo" -> "mensaje"
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
-        // 1. Recorremos los errores de campos específicos (ej.: @Pattern en "cuit")
+        // Errores de campo (ej.: nombre vacío)
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
 
-        // 2. Recorremos los errores globales (ej: tu @AssertTrue de "isCuitConsistente")
+        // Errores globales (ej: @AssertTrue del CUIT)
         for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-            // Usamos el nombre del objeto (ej.: "huespedDTO") como clave
             errors.put(error.getObjectName(), error.getDefaultMessage());
         }
 
-        return errors;
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    // --- Puedes agregar más manejadores aquí ---
+    // 2. DNI Duplicado -> Error 409
     @ExceptionHandler(DniExistente.class)
-    public ResponseEntity<Object> handleDocumentoExistenteException(DniExistente ex) {
-        // Devuelve el JSON que tu modal "ActionModal" espera.
-        Map<String, String> error = Map.of("error", ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT); // 409 Conflict
-    }
-    // Por ejemplo, para tus excepciones personalizadas como CuitExistente
-    @ExceptionHandler(UsuarioExistente.class)
-    public ResponseEntity<Object> handleUsuarioExistenteException(UsuarioExistente ex) {
-        Map<String, String> error = Map.of("nombre", ex.getMessage());
-        // HttpStatus.CONFLICT (409) es el código semántico para "recurso ya existe"
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
-    }
-    @ExceptionHandler(CuitExistente.class) // Asumiendo que tienes esta clase
-    @ResponseStatus(HttpStatus.CONFLICT) // 409 Conflict es bueno para "ya existe"
-    public Map<String, String> handleCuitExistente(CuitExistente ex) {
-        return Map.of("error", ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleDniExistente(DniExistente ex) {
+        return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.CONFLICT);
     }
 
+    // 3. CUIT Duplicado -> Error 409
+    @ExceptionHandler(CuitExistente.class)
+    public ResponseEntity<Map<String, String>> handleCuitExistente(CuitExistente ex) {
+        return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.CONFLICT);
+    }
 
+    // 4. Usuario Duplicado -> Error 409
+    @ExceptionHandler(UsuarioExistente.class) // O UsuarioExistenteException
+    public ResponseEntity<Map<String, String>> handleUsuarioExistente(UsuarioExistente ex) {
+        // Devolvemos la clave "nombre" para que se marque el campo en el formulario de registro
+        return new ResponseEntity<>(Map.of("nombre", ex.getMessage()), HttpStatus.CONFLICT);
+    }
+
+    // 5. Usuario o Contraseña incorrectos -> Error 401
+    @ExceptionHandler(ContraseniaInvalida.class) // O como se llame tu excepción de login
+    public ResponseEntity<Map<String, String>> handleCredencialesInvalidas(Exception ex) {
+        return new ResponseEntity<>(Map.of("global", ex.getMessage()), HttpStatus.UNAUTHORIZED);
+    }
+
+    // 6. "El Paracaídas": Cualquier otro error no controlado -> Error 500
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {
+        // Esto asegura que el front siempre reciba JSON, incluso si el servidor explota
+        Map<String, String> error = Map.of("global", "Error interno del servidor: " + ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UsuarioNoEncontrado.class)
+    public ResponseEntity<Map<String, String>> handleUsuarioNoEncontrado(UsuarioNoEncontrado ex) {
+        // Devolvemos un JSON con la clave "global" para que el Login lo muestre abajo
+        // Usamos status 404 (Not Found) o 401 (Unauthorized)
+        return new ResponseEntity<>(Map.of("global", ex.getMessage()), HttpStatus.NOT_FOUND);
+    }
 }

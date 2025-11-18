@@ -1,17 +1,16 @@
 package org.TPDesarrollo.Gestores;
 
-import org.TPDesarrollo.DAOs.HuespedDAO;
+import org.TPDesarrollo.Repository.HuespedRepository;
 import org.TPDesarrollo.Excepciones.DniExistente;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import org.TPDesarrollo.Excepciones.CuitExistente;
 import org.TPDesarrollo.Clases.Direccion;
 import org.TPDesarrollo.Clases.Huesped;
 import org.TPDesarrollo.DTOs.DireccionDTO;
 import org.TPDesarrollo.DTOs.HuespedDTO;
-import org.TPDesarrollo.Excepciones.CuitExistente;
 import org.TPDesarrollo.Enums.TipoDocumento;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,98 +18,91 @@ import java.util.stream.Collectors;
 @Service
 public class GestorHuesped {
 
+    // 1. CAMBIO: Inyección por Constructor (Variable final)
+    private final HuespedRepository huespedRepository;
+
     @Autowired
-    private HuespedDAO huespedDAO;
+    public GestorHuesped(HuespedRepository huespedRepository) {
+        this.huespedRepository = huespedRepository;
+    }
 
     @Transactional(readOnly = true)
     public List<HuespedDTO> buscarHuespedes(String apellido, String nombre, String tipoDocumento, String documento) {
+
         System.out.println("GESTOR: Solicitud para buscar huéspedes...");
-        System.out.println("Parámetros - apellido: '" + apellido + "', nombre: '" + nombre +
-                "', tipoDocumento: '" + tipoDocumento + "', documento: '" + documento + "'");
 
-        try {
-            // Manejo más robusto de parámetros
-            String apellidoParam = (apellido != null && !apellido.trim().isEmpty()) ? apellido.trim() : null;
-            String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
-            String documentoParam = (documento != null && !documento.trim().isEmpty()) ? documento.trim() : null;
+        // Manejo robusto de parámetros (Igual que antes)
+        String apellidoParam = (apellido != null && !apellido.trim().isEmpty()) ? apellido.trim() : null;
+        String nombreParam = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
+        String documentoParam = (documento != null && !documento.trim().isEmpty()) ? documento.trim() : null;
 
-            TipoDocumento tipoDocEnum = null;
-            if (tipoDocumento != null && !tipoDocumento.trim().isEmpty()) {
-                try {
-                    tipoDocEnum = TipoDocumento.valueOf(tipoDocumento.trim().toUpperCase());
-                    System.out.println("Tipo documento convertido: " + tipoDocEnum);
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Tipo documento inválido, se ignorará: " + tipoDocumento);
-                    // No lanzamos excepción, simplemente ignoramos este filtro
-                }
+        TipoDocumento tipoDocEnum = null;
+        if (tipoDocumento != null && !tipoDocumento.trim().isEmpty()) {
+            try {
+                tipoDocEnum = TipoDocumento.valueOf(tipoDocumento.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Tipo documento inválido, se ignorará.");
             }
-
-            List<Huesped> huespedesEncontrados = huespedDAO.buscarHuespedesPorCriterios(
-                    apellidoParam,
-                    nombreParam,
-                    tipoDocEnum,
-                    documentoParam
-            );
-
-            System.out.println("Huéspedes encontrados: " + huespedesEncontrados.size());
-
-            return huespedesEncontrados.stream()
-                    .map(this::convertirA_DTO)
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            System.err.println("ERROR en GestorHuesped.buscarHuespedes: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al buscar huéspedes: " + e.getMessage(), e);
         }
+
+        List<Huesped> huespedesEncontrados = huespedRepository.buscarHuespedesPorCriterios(
+                apellidoParam, nombreParam, tipoDocEnum, documentoParam
+        );
+
+        return huespedesEncontrados.stream()
+                .map(this::convertirA_DTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public HuespedDTO obtenerHuespedSeleccionado(Integer idHuesped) {
-        return huespedDAO.findById(idHuesped)
+        return huespedRepository.findById(idHuesped)
                 .map(this::convertirA_DTO)
                 .orElse(null);
     }
 
     @Transactional
-    // 1. CAMBIA "void" por "Huesped"
     public Huesped darDeAltaHuesped(HuespedDTO huespedDTO) {
         System.out.println("GESTOR: Solicitud para dar de alta a " + huespedDTO.getNombre());
-        String cuit = huespedDTO.getCuit();
 
-        if (huespedDAO.existsByDocumento(huespedDTO.getDocumento())) {
+        // Validaciones
+        if (huespedRepository.existsByDocumento(huespedDTO.getDocumento())) {
             throw new DniExistente("El DNI/Documento ingresado ya existe.");
         }
+
+        String cuit = huespedDTO.getCuit();
         if (cuit != null && !cuit.trim().isEmpty()) {
-            if (huespedDAO.existsByCuit(cuit)) {
-                throw new CuitExistente(cuit);
+            if (huespedRepository.existsByCuit(cuit)) {
+                throw new CuitExistente("El CUIT ya existe: " + cuit);
             }
         } else {
             huespedDTO.setPosicionIVA("Consumidor Final");
         }
 
+        // Conversión usando el nuevo método con BUILDER
         Huesped huespedEntidad = convertirA_Entidad(huespedDTO);
 
-        // 2. GUARDA Y DEVUELVE LA ENTIDAD EN UN SOLO PASO
-        return huespedDAO.save(huespedEntidad);
+        return huespedRepository.save(huespedEntidad);
     }
 
     @Transactional
     public void modificarHuesped(HuespedDTO huespedDTO) {
-        System.out.println("GESTOR: Solicitud para modificar al huésped ID: " + huespedDTO.getId());
+        // OJO: Para modificar, lo ideal es buscar primero, actualizar campos y guardar.
+        // Pero si usas convertirA_Entidad
         Huesped huespedEntidad = convertirA_Entidad(huespedDTO);
-        huespedDAO.save(huespedEntidad);
-        String nombre = (huespedEntidad.getNombre() != null) ? huespedEntidad.getNombre() : "N/A";
-        System.out.println("GESTOR: Modificación de " + nombre + " exitosa.");
+        huespedRepository.save(huespedEntidad);
     }
 
     @Transactional
     public void darDeBajaHuesped(Integer id) {
-        System.out.println("GESTOR: Solicitud para dar de baja al ID " + id);
-        huespedDAO.deleteById(id);
+        huespedRepository.deleteById(id);
     }
 
+    // --- MÉTODOS DE CONVERSIÓN REFACTORIZADOS CON BUILDER ---
+
     private HuespedDTO convertirA_DTO(Huesped entidad) {
+        // Los DTO suelen ser simples, el constructor vacío + setters está bien,
+        // o podrías hacer un Builder para el DTO también si quisieras.
         HuespedDTO dto = new HuespedDTO();
         dto.setId(entidad.getId());
         dto.setNombre(entidad.getNombre());
@@ -118,57 +110,69 @@ public class GestorHuesped {
         dto.setTelefono(entidad.getTelefono());
         dto.setTipoDocumento(entidad.getTipoDocumento());
         dto.setDocumento(entidad.getDocumento());
+
         if (entidad.getDireccion() != null) {
             dto.setDireccion(new DireccionDTO(entidad.getDireccion()));
         }
+
         dto.setCuit(entidad.getCuit());
         dto.setEmail(entidad.getEmail());
         dto.setFechaNacimiento(entidad.getFechaNacimiento());
         dto.setNacionalidad(entidad.getNacionalidad());
         dto.setOcupacion(entidad.getOcupacion());
+        // Si usas Enum en Huesped, conviértelo a String aquí:
+        // dto.setPosicionIVA(entidad.getPosicionIVA().toString());
         dto.setPosicionIVA(entidad.getPosicionIVA());
+
         return dto;
     }
 
     private Huesped convertirA_Entidad(HuespedDTO dto) {
-        Huesped entidad = new Huesped();
-
-        if (dto.getId() != null) {
-            entidad.setId(dto.getId());
-        }
-
-        // Seteamos los campos heredados de Persona directamente en la entidad Huesped
-        entidad.setNombre(dto.getNombre());
-        entidad.setApellido(dto.getApellido());
-        entidad.setTelefono(dto.getTelefono());
-        entidad.setDocumento(dto.getDocumento());
-        entidad.setTipoDocumento(dto.getTipoDocumento());
-
+        // 2. CAMBIO: Uso de Builder para Dirección
+        Direccion direccionEntidad = null;
         if (dto.getDireccion() != null) {
-            entidad.setDireccion(convertirDireccionA_Entidad(dto.getDireccion()));
+            DireccionDTO dDto = dto.getDireccion();
+
+            direccionEntidad = Direccion.builder()
+                    .calle(dDto.getCalle())
+                    .numero(dDto.getNumero())
+                    .pais(dDto.getPais())
+                    .provincia(dDto.getProvincia())
+                    .localidad(dDto.getLocalidad())
+                    .departamento(dDto.getDepartamento())
+                    .piso(dDto.getPiso())
+                    .codigoPostal(dDto.getCodigoPostal())
+                    .build();
         }
 
-        entidad.setCuit(dto.getCuit());
-        entidad.setOcupacion(dto.getOcupacion());
-        entidad.setPosicionIVA(dto.getPosicionIVA());
-        entidad.setEmail(dto.getEmail());
-        entidad.setFechaNacimiento(dto.getFechaNacimiento());
-        entidad.setNacionalidad(dto.getNacionalidad());
+        // 3. CAMBIO: Uso de Builder para Huesped (con herencia de Persona)
+        // ¡Mira qué limpio queda esto comparado con los setters!
 
-        return entidad;
+        Huesped huesped = Huesped.builder()
+                // Datos de Persona
+                .nombre(dto.getNombre())
+                .apellido(dto.getApellido())
+                .telefono(dto.getTelefono())
+                .documento(dto.getDocumento())
+                .tipoDocumento(dto.getTipoDocumento())
+                .direccion(direccionEntidad)
+                // Datos de Huesped
+                .cuit(dto.getCuit())
+                .email(dto.getEmail())
+                .nacionalidad(dto.getNacionalidad())
+                .ocupacion(dto.getOcupacion())
+                .fechaNacimiento(dto.getFechaNacimiento())
+                .posicionIVA(dto.getPosicionIVA()) // Si cambiaste a Enum: RazonSocial.valueOf(dto.getPosicionIVA())
+                .build();
+
+        // Si es una actualización, seteamos el ID manualmente (el Builder crea objetos nuevos)
+        if (dto.getId() != null) {
+            huesped.setId(dto.getId());
+        }
+
+        return huesped;
     }
 
-    private Direccion convertirDireccionA_Entidad(DireccionDTO dto) {
-        if (dto == null) return null;
-        return new Direccion(
-                dto.getPais(),
-                dto.getProvincia(),
-                dto.getLocalidad(),
-                dto.getCalle(),
-                dto.getNumero(),
-                dto.getDepartamento(),
-                dto.getPiso(),
-                dto.getCodigoPostal()
-        );
-    }
+    // El método 'convertirDireccionA_Entidad' ya no es necesario porque
+    // lo integramos arriba con el Builder, queda mucho más directo.
 }

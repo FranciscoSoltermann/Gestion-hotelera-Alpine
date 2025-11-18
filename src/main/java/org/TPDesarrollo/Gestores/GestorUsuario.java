@@ -2,54 +2,61 @@ package org.TPDesarrollo.Gestores;
 
 import org.TPDesarrollo.Clases.Usuario;
 import org.TPDesarrollo.DTOs.UsuarioDTO;
-import org.TPDesarrollo.DAOs.UsuarioDAO;
+import org.TPDesarrollo.Repository.UsuarioRepository;
 import org.TPDesarrollo.Excepciones.UsuarioExistente;
 import org.TPDesarrollo.Excepciones.UsuarioNoEncontrado;
 import org.TPDesarrollo.Excepciones.ContraseniaInvalida;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 public class GestorUsuario {
 
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder; // <-- Inyectamos el codificador
+
     @Autowired
-    private UsuarioDAO usuarioRepo;
+    public GestorUsuario(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Transactional(readOnly = true)
-    public boolean autenticarUsuario(String nombre, String contrasenia)
-            throws UsuarioNoEncontrado, ContraseniaInvalida {
+    // 1. CAMBIO: De 'void' a 'Usuario'
+    public Usuario autenticarUsuario(String nombre, String contrasenia) throws UsuarioNoEncontrado, ContraseniaInvalida {
 
-        Usuario usuarioAlmacenado = usuarioRepo.findByNombre(nombre)
+        // 1. Buscamos el usuario
+        Usuario usuarioAlmacenado = usuarioRepository.findByNombre(nombre)
                 .orElseThrow(() -> new UsuarioNoEncontrado("Usuario no encontrado: " + nombre));
 
-        if (!usuarioAlmacenado.getContrasenia().equals(contrasenia)) {
+        // 2. ¡SEGURIDAD! Comparamos la contraseña
+        if (!passwordEncoder.matches(contrasenia, usuarioAlmacenado.getContrasenia())) {
             throw new ContraseniaInvalida("Contraseña incorrecta.");
         }
 
-        return true;
+        // 3. CAMBIO: ¡Devolvemos el usuario encontrado!
+        return usuarioAlmacenado;
     }
 
-    public Usuario iniciarSesion(String nombre, String contrasenia) {
-        return usuarioRepo.findByNombreAndContrasenia(nombre, contrasenia).orElse(null);
-    }
+    @Transactional
     public Usuario registrarUsuario(UsuarioDTO datos) {
         // 1. Verifica si el usuario ya existe
-        if (usuarioRepo.findByNombre(datos.getNombre()).isPresent()) {
-            // ¡Lanza la excepción específica!
+        if (usuarioRepository.findByNombre(datos.getNombre()).isPresent()) {
             throw new UsuarioExistente("El nombre de usuario '" + datos.getNombre() + "' ya existe.");
         }
 
-        // 2. Crea el nuevo usuario
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setNombre(datos.getNombre());
-
-        // 🚨 ALERTA DE SEGURIDAD: ¡Estás guardando contraseñas en texto plano!
-        // Esto es muy inseguro. Deberías encriptarlas (ver nota abajo).
-        nuevoUsuario.setContrasenia(datos.getContrasenia());
-        nuevoUsuario.setRol("ADMIN"); // Asigna un rol por defecto
+        // 2. Crea el nuevo usuario usando el BUILDER (¡Mucho más limpio!)
+        Usuario nuevoUsuario = Usuario.builder()
+                .nombre(datos.getNombre())
+                // ¡SEGURIDAD! Encriptamos la contraseña antes de guardarla
+                .contrasenia(passwordEncoder.encode(datos.getContrasenia()))
+                .rol("ADMIN") // O "USER", según tu lógica
+                .build();
 
         // 3. Guarda y devuelve el usuario
-        return usuarioRepo.save(nuevoUsuario);
+        return usuarioRepository.save(nuevoUsuario);
     }
 }
