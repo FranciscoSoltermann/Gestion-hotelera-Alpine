@@ -3,9 +3,8 @@ package org.TPDesarrollo.clases;
 import jakarta.persistence.*;
 import org.TPDesarrollo.enums.TipoDocumento;
 
-// @Entity <-- Si usas estrategia JOINED, usa @Entity y @Inheritance
-// @Inheritance(strategy = InheritanceType.JOINED)
-@MappedSuperclass // <-- Si usas esto, no habrá tabla 'persona', sus campos irán a los hijos.
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Persona {
 
     @Id
@@ -29,9 +28,7 @@ public abstract class Persona {
     @Column(name = "tipo_doc", nullable = false)
     private TipoDocumento tipoDocumento;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_direccion")
-    private Direccion direccion;
+
 
     // 1. Constructor vacío (Obligatorio para JPA)
     public Persona() {}
@@ -43,7 +40,6 @@ public abstract class Persona {
         this.telefono = builder.telefono;
         this.documento = builder.documento;
         this.tipoDocumento = builder.tipoDocumento;
-        this.direccion = builder.direccion;
     }
 
     // Getters y Setters (Necesarios para JPA y lógica)
@@ -59,8 +55,6 @@ public abstract class Persona {
     public void setDocumento(String documento) { this.documento = documento; }
     public TipoDocumento getTipoDocumento() { return tipoDocumento; }
     public void setTipoDocumento(TipoDocumento tipoDocumento) { this.tipoDocumento = tipoDocumento; }
-    public Direccion getDireccion() { return direccion; }
-    public void setDireccion(Direccion direccion) { this.direccion = direccion; }
 
     // --- PATRÓN BUILDER GENÉRICO ---
 

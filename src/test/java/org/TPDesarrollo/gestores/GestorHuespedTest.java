@@ -2,6 +2,7 @@ package org.TPDesarrollo.gestores;
 
 import org.TPDesarrollo.clases.Huesped;
 import org.TPDesarrollo.dtos.HuespedDTO;
+import org.TPDesarrollo.enums.RazonSocial;
 import org.TPDesarrollo.exceptions.DniExistente;
 import org.TPDesarrollo.repository.HuespedRepository;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class GestorHuespedTest {
         // Ponemos datos mínimos para que no falle el builder interno del Gestor
         dto.setNombre("Test");
         dto.setApellido("Test");
-        dto.setPosicionIVA("Consumidor_Final");
+        dto.setPosicionIVA(RazonSocial.Consumidor_Final);
 
         // Simulamos que NO existe el documento
         when(huespedRepository.existsByDocumento("99999999")).thenReturn(false);
