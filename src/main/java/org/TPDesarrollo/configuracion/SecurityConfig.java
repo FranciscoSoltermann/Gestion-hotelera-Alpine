@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // 1. Tu PasswordEncoder (ya lo tenías, déjalo así)
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -30,8 +30,8 @@ public class SecurityConfig {
                         // Permitimos entrar a TODOS a las rutas de usuario (login, registrar)
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/huespedes/**").permitAll()
-
-
+                        .requestMatchers("/api/reservas/**").permitAll()
+                        .requestMatchers("/api/habitaciones/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

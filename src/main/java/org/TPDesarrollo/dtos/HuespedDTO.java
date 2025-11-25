@@ -2,6 +2,7 @@ package org.TPDesarrollo.dtos;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import org.TPDesarrollo.enums.RazonSocial;
 import org.TPDesarrollo.enums.TipoDocumento;
 import java.time.LocalDate;
 
@@ -59,8 +60,8 @@ public class HuespedDTO {
     @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "La ocupación solo puede contener letras y espacios.")
     private String ocupacion;
 
-    @NotBlank(message = "La posición frente al IVA es obligatoria")
-    private String posicionIVA;
+    @NotNull(message = "La posición frente al IVA es obligatoria")
+    private RazonSocial posicionIVA;
 
     @AssertTrue(message = "El CUIT es obligatorio si la posición frente al IVA no es 'Consumidor Final'.")
     private boolean isCuitConsistente() {
@@ -73,7 +74,7 @@ public class HuespedDTO {
 
         // CASO 1: Si es Consumidor Final, la validación pasa.
         // No nos importa si el CUIT es nulo o no.
-        if (posicionIVA.equalsIgnoreCase("Consumidor_Final")) {
+        if (posicionIVA.name().equalsIgnoreCase("Consumidor_Final") || posicionIVA.toString().equalsIgnoreCase("Consumidor Final")) {
             return true;
         }
 
@@ -109,6 +110,6 @@ public class HuespedDTO {
     public void setCuit(String cuit) { this.cuit = cuit; }
     public String getOcupacion() { return ocupacion; }
     public void setOcupacion(String ocupacion) { this.ocupacion = ocupacion; }
-    public String getPosicionIVA() { return posicionIVA; }
-    public void setPosicionIVA(String posicionIVA) { this.posicionIVA = posicionIVA; }
+    public RazonSocial getPosicionIVA() { return posicionIVA; }
+    public void setPosicionIVA(RazonSocial posicionIVA) { this.posicionIVA = posicionIVA; }
 }
