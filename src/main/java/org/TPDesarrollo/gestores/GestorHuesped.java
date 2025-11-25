@@ -214,7 +214,7 @@ public class GestorHuesped {
         nuevoDTO.setDocumento(reservaDTO.getNumeroDocumento());
         nuevoDTO.setTelefono(reservaDTO.getTelefono());
         nuevoDTO.setEmail(reservaDTO.getEmail());
-
+ 
         // Al reutilizar este método, ganamos las validaciones y lógica que ya tenías
         // (como asignar Consumidor Final automáticamente)
         return darDeAltaHuesped(nuevoDTO);
