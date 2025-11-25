@@ -7,4 +7,5 @@ import org.TPDesarrollo.clases.Habitacion;
 @Entity
 @Table(name = "superior_family") // Ajustado al diagrama ER (dice 'Superior_Family')
 public class SuperiorFamilyPlan extends Habitacion {
+
 }
