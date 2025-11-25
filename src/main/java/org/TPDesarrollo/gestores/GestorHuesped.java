@@ -188,4 +188,35 @@ public class GestorHuesped {
 
         return huesped;
     }
+    @Transactional
+    public Huesped buscarOCrearHuesped(org.TPDesarrollo.dtos.ReservaDTO reservaDTO) {
+
+        // 1. Intentamos buscar si ya existe (Usamos tu repositorio directamente)
+        List<Huesped> existentes = huespedRepository.buscarHuespedesPorCriterios(
+                null, // No filtramos por apellido
+                null, // No filtramos por nombre
+                reservaDTO.getTipoDocumento(),
+                reservaDTO.getNumeroDocumento()
+        );
+
+        if (!existentes.isEmpty()) {
+            // Si existe, retornamos la entidad encontrada
+            return existentes.get(0);
+        }
+
+        // 2. Si NO existe, reutilizamos tu método 'darDeAltaHuesped'
+        // Para eso, primero adaptamos los datos de la Reserva a un HuespedDTO
+        HuespedDTO nuevoDTO = new HuespedDTO();
+
+        nuevoDTO.setNombre(reservaDTO.getNombre());
+        nuevoDTO.setApellido(reservaDTO.getApellido());
+        nuevoDTO.setTipoDocumento(reservaDTO.getTipoDocumento());
+        nuevoDTO.setDocumento(reservaDTO.getNumeroDocumento());
+        nuevoDTO.setTelefono(reservaDTO.getTelefono());
+        nuevoDTO.setEmail(reservaDTO.getEmail());
+ 
+        // Al reutilizar este método, ganamos las validaciones y lógica que ya tenías
+        // (como asignar Consumidor Final automáticamente)
+        return darDeAltaHuesped(nuevoDTO);
+    }
 }
