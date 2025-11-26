@@ -1,10 +1,12 @@
 package org.TPDesarrollo.clases;
 
 import jakarta.persistence.*;
+import org.TPDesarrollo.enums.EstadoHabitacion; // Asegúrate de importar tu Enum
+
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "reserva", schema = "pruebabdd") // Agregué el esquema por si acaso
+@Table(name = "reserva", schema = "pruebabdd")
 public class Reserva {
 
     @Id
@@ -12,14 +14,15 @@ public class Reserva {
     @Column(name = "id_reserva")
     private Integer id_reserva;
 
-    @Column(name = "ingreso") // Según tu foto
+    @Column(name = "ingreso")
     private LocalDate ingreso;
 
-    @Column(name = "egreso") // Según tu foto
+    @Column(name = "egreso")
     private LocalDate egreso;
 
-    @Column(name = "id_persona") // Según tu foto
+    @Column(name = "id_persona")
     private Integer idPersona;
+
 
     public Reserva() {}
 
@@ -36,4 +39,23 @@ public class Reserva {
 
     public Integer getIdPersona() { return idPersona; }
     public void setIdPersona(Integer idPersona) { this.idPersona = idPersona; }
+
+    // --- GETTERS QUE FALTABAN PARA EL GESTOR ---
+
+    // Estos métodos actúan como alias para que tu GestorHabitacion no falle
+    // al llamar a getFechaIngreso()
+    public LocalDate getFechaIngreso() {
+        return this.ingreso;
+    }
+
+    public LocalDate getFechaEgreso() {
+        return this.egreso;
+    }
+
+    // Método lógico para determinar el estado.
+    // Si la reserva existe y está activa, asumimos que la habitación está 'OCUPADA' o 'RESERVADA'.
+    public EstadoHabitacion getEstadoHabitacion() {
+        // Puedes cambiar esto a RESERVADA si prefieres mostrar ese color
+        return EstadoHabitacion.OCUPADA;
+    }
 }

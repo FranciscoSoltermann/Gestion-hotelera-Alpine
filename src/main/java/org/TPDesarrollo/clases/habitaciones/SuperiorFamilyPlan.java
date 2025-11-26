@@ -5,7 +5,7 @@ import jakarta.persistence.Table;
 import org.TPDesarrollo.clases.Habitacion;
 
 @Entity
-@Table(name = "superior_family") // Ajustado al diagrama ER (dice 'Superior_Family')
+@Table(name = "superior_family", schema = "pruebabdd")
 public class SuperiorFamilyPlan extends Habitacion {
 
 }

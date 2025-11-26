@@ -1,10 +1,12 @@
 package org.TPDesarrollo.gestores;
 
 import org.TPDesarrollo.clases.Habitacion;
+import org.TPDesarrollo.clases.Reserva;
 import org.TPDesarrollo.dtos.EstadoDiaDTO;
 import org.TPDesarrollo.dtos.GrillaHabitacionDTO;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import org.TPDesarrollo.repository.HabitacionRepository;
+import org.TPDesarrollo.repository.ReservaRepository; // IMPORTACIÓN AGREGADA
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,54 +14,83 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map; // IMPORTACIÓN AGREGADA
+import java.util.stream.Collectors; // IMPORTACIÓN AGREGADA
 
 @Service
 public class GestorHabitacion {
 
     private final HabitacionRepository habitacionRepository;
+    private final ReservaRepository reservaRepository; // VARIABLE AGREGADA
 
     @Autowired
-    public GestorHabitacion(HabitacionRepository habitacionRepository) {
+    public GestorHabitacion(HabitacionRepository habitacionRepository, ReservaRepository reservaRepository) { // INYECCIÓN AGREGADA
         this.habitacionRepository = habitacionRepository;
+        this.reservaRepository = reservaRepository;
     }
 
     @Transactional(readOnly = true)
     public List<GrillaHabitacionDTO> obtenerEstadoHabitaciones(LocalDate fechaDesde, LocalDate fechaHasta) {
 
-        if (fechaDesde == null || fechaHasta == null) throw new IllegalArgumentException("Fechas obligatorias");
-        if (fechaDesde.isAfter(fechaHasta)) throw new IllegalArgumentException("Fecha desde posterior a hasta");
+        if (fechaDesde == null || fechaHasta == null)
+            throw new IllegalArgumentException("Las fechas no pueden ser nulas");
 
-        List<Habitacion> todasLasHabitaciones = habitacionRepository.findAll();
-        List<GrillaHabitacionDTO> grilla = new ArrayList<>();
+        if (fechaDesde.isAfter(fechaHasta))
+            throw new IllegalArgumentException("La fecha desde no puede ser posterior a hasta");
 
-        for (Habitacion hab : todasLasHabitaciones) {
+        // 1) Todas las habitaciones
+        List<Habitacion> todas = habitacionRepository.findAll();
+
+        // 2) Traer reservas solapadas
+        // Asegúrate de que este método exista en tu ReservaRepository
+        List<Reserva> reservasSolapadas =
+                reservaRepository.encontrarReservasEnRango(fechaDesde, fechaHasta);
+
+        // Agrupar reservas por habitación
+        Map<Long, List<Reserva>> reservasPorHab = reservasSolapadas.stream()
+                .collect(Collectors.groupingBy(r -> r.getHabitacion().getId()));
+
+        List<GrillaHabitacionDTO> resultado = new ArrayList<>();
+
+        for (Habitacion hab : todas) {
+
             GrillaHabitacionDTO fila = new GrillaHabitacionDTO();
             fila.setIdHabitacion(hab.getId());
-            fila.setNumero(hab.getNumero()); // Ahora es String, no necesita conversión
+            fila.setNumero(hab.getNumero());
             fila.setTipo(hab.getClass().getSimpleName());
 
-            List<EstadoDiaDTO> estadosDias = new ArrayList<>();
-            LocalDate diaActual = fechaDesde;
+            List<EstadoDiaDTO> estados = new ArrayList<>();
 
-            while (!diaActual.isAfter(fechaHasta)) {
-                EstadoHabitacion estadoDelDia = EstadoHabitacion.DISPONIBLE;
+            LocalDate dia = fechaDesde;
 
-                // LÓGICA CAMBIADA PARA TU BD:
-                // Miramos directamente los campos 'ingreso' y 'egreso' de la habitación
-                if (hab.getIngreso() != null && hab.getEgreso() != null) {
-                    if (!diaActual.isBefore(hab.getIngreso()) && !diaActual.isAfter(hab.getEgreso())) {
-                        // Si el día cae dentro del rango de ocupación actual de la habitación
-                        estadoDelDia = hab.getEstado(); // Usamos el estado actual (ej: OCUPADA)
+            while (!dia.isAfter(fechaHasta)) {
+
+                EstadoHabitacion estado = EstadoHabitacion.DISPONIBLE;
+
+                List<Reserva> reservas = reservasPorHab.get(hab.getId());
+
+                if (reservas != null) {
+                    for (Reserva r : reservas) {
+                        // Verificamos si el día cae dentro del rango de la reserva
+                        boolean dentro =
+                                !dia.isBefore(r.getFechaIngreso()) &&
+                                        !dia.isAfter(r.getFechaEgreso());
+
+                        if (dentro) {
+                            estado = r.getEstadoHabitacion(); // debe venir de la reserva
+                            break; // Prioridad a la primera reserva encontrada (o definir lógica de prioridad)
+                        }
                     }
                 }
 
-                estadosDias.add(new EstadoDiaDTO(diaActual, estadoDelDia));
-                diaActual = diaActual.plusDays(1);
+                estados.add(new EstadoDiaDTO(dia, estado));
+                dia = dia.plusDays(1);
             }
 
-            fila.setEstadosPorDia(estadosDias);
-            grilla.add(fila);
+            fila.setEstadosPorDia(estados);
+            resultado.add(fila);
         }
-        return grilla;
+
+        return resultado;
     }
 }

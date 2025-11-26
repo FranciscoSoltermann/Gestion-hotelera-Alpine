@@ -5,6 +5,6 @@ import jakarta.persistence.Table;
 import org.TPDesarrollo.clases.Habitacion;
 
 @Entity
-@Table(name = "doble_estandar")
+@Table(name = "doble_estandar", schema = "pruebabdd")
 public class DobleEstandar extends Habitacion {
 }
