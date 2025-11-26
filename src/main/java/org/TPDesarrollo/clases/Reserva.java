@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 
 import java.time.LocalDate;
-import java.util.ArrayList; // No olvides importar ArrayList
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,21 +25,15 @@ public class Reserva {
     @Column(name = "id_persona")
     private Integer idPersona;
 
-    // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
-    // Debes declarar la lista y poner las anotaciones sobre ella.
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "reserva_habitacion",
-            joinColumns = @JoinColumn(name = "id_reserva"),
-            inverseJoinColumns = @JoinColumn(name = "id_habitacion")
-    )
+    // --- CORRECCIÓN IMPORTANTE ---
+    // Una reserva tiene MUCHAS habitaciones
+    // mappedBy = "reservaActual" referencia el campo en Habitacion
+    @OneToMany(mappedBy = "reservaActual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Habitacion> habitaciones = new ArrayList<>();
-
 
     public Reserva() {}
 
     // --- GETTERS Y SETTERS ---
-
     public Integer getId() { return id_reserva; }
     public void setId(Integer id) { this.id_reserva = id; }
 
@@ -52,21 +46,13 @@ public class Reserva {
     public Integer getIdPersona() { return idPersona; }
     public void setIdPersona(Integer idPersona) { this.idPersona = idPersona; }
 
-    // --- MÉTODOS AUXILIARES ---
-
     public LocalDate getFechaIngreso() {
-        return this.ingreso;
+        return this.ingreso;  // ahora coincide con el atributo real
     }
 
     public LocalDate getFechaEgreso() {
-        return this.egreso;
+        return this.egreso;   // ahora coincide con el atributo real
     }
-
-    public EstadoHabitacion getEstadoHabitacion() {
-        return EstadoHabitacion.OCUPADA;
-    }
-
-    // --- GETTER Y SETTER PARA LA LISTA ---
 
     public List<Habitacion> getHabitaciones() {
         return habitaciones;
@@ -74,5 +60,27 @@ public class Reserva {
 
     public void setHabitaciones(List<Habitacion> habitaciones) {
         this.habitaciones = habitaciones;
+    }
+
+    public void agregarHabitacion(Habitacion habitacion) {
+        this.habitaciones.add(habitacion);
+        habitacion.setReservaActual(this);
+    }
+
+    public EstadoHabitacion getEstadoHabitacion() {
+
+        // Si la reserva aplica a varias habitaciones,
+        // podemos decir que mientras exista una habitación ocupada,
+        // la reserva "está ocupando".
+
+        if (habitaciones == null || habitaciones.isEmpty()) {
+            return EstadoHabitacion.DISPONIBLE;
+        }
+
+        // Si alguna habitación asociada está ocupada → la reserva está ocupada
+        boolean algunaOcupada = habitaciones.stream()
+                .anyMatch(h -> h.getEstado() == EstadoHabitacion.OCUPADA);
+
+        return algunaOcupada ? EstadoHabitacion.OCUPADA : EstadoHabitacion.DISPONIBLE;
     }
 }

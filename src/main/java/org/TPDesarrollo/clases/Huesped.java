@@ -24,8 +24,10 @@ public class Huesped extends Persona {
 
     private String email;
 
-    // ⭐ ESTE ES EL CAMPO QUE FALTABA ⭐
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // ⭐ CORRECCIÓN APLICADA: CAMBIADO A EAGER ⭐
+    // Usamos EAGER para que la dirección venga cargada sí o sí.
+    // Esto evita el error silencioso al convertir a JSON.
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_direccion")
     private Direccion direccion;
 
@@ -39,7 +41,7 @@ public class Huesped extends Persona {
         this.fechaNacimiento = builder.fechaNacimiento;
         this.posicionIVA = builder.posicionIVA;
         this.email = builder.email;
-        this.direccion = builder.direccion; // <--- ⭐ SE SETEA AQUÍ ⭐
+        this.direccion = builder.direccion;
     }
 
     public static HuespedBuilder builder() {
@@ -77,8 +79,6 @@ public class Huesped extends Persona {
         private LocalDate fechaNacimiento;
         private RazonSocial posicionIVA;
         private String email;
-
-        // ⭐ agregar campo direccion aquí ⭐
         private Direccion direccion;
 
         @Override

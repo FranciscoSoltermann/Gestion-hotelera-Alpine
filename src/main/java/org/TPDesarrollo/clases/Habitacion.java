@@ -1,5 +1,6 @@
 package org.TPDesarrollo.clases;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
@@ -39,33 +40,44 @@ public abstract class Habitacion {
     @Column(name = "egreso")
     private LocalDate egreso;
 
-    @OneToOne
+    // --- CORRECCIÓN IMPORTANTE ---
+    // Una habitación puede pertenecer a UNA sola reserva (Many-to-One)
+    @ManyToOne
     @JoinColumn(name = "id_reserva")
+    @JsonIgnore
     private Reserva reservaActual;
 
     public Habitacion() {
     }
 
-
     // --- GETTERS Y SETTERS ---
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
+
     public String getNumero() { return numero; }
     public void setNumero(String numero) { this.numero = numero; }
+
     public EstadoHabitacion getEstado() { return estado; }
     public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
+
     public Double getCosto() { return costo; }
     public void setCosto(Double costo) { this.costo = costo; }
+
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
+
     public Integer getCamaInd() { return camaInd; }
     public void setCamaInd(Integer camaInd) { this.camaInd = camaInd; }
+
     public Integer getCamaDoble() { return camaDoble; }
     public void setCamaDoble(Integer camaDoble) { this.camaDoble = camaDoble; }
+
     public LocalDate getIngreso() { return ingreso; }
     public void setIngreso(LocalDate ingreso) { this.ingreso = ingreso; }
+
     public LocalDate getEgreso() { return egreso; }
     public void setEgreso(LocalDate egreso) { this.egreso = egreso; }
+
     public Reserva getReservaActual() { return reservaActual; }
     public void setReservaActual(Reserva reservaActual) { this.reservaActual = reservaActual; }
 }
