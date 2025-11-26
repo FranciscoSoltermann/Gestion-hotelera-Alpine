@@ -13,9 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map; // IMPORTACIÓN AGREGADA
-import java.util.stream.Collectors; // IMPORTACIÓN AGREGADA
+
 
 @Service
 public class GestorHabitacion {
@@ -47,8 +48,28 @@ public class GestorHabitacion {
                 reservaRepository.encontrarReservasEnRango(fechaDesde, fechaHasta);
 
         // Agrupar reservas por habitación
-        Map<Long, List<Reserva>> reservasPorHab = reservasSolapadas.stream()
-                .collect(Collectors.groupingBy(r -> r.getHabitacion().getId()));
+        Map<Integer, List<Reserva>> reservasPorHab = new HashMap<>();
+
+// 2. Recorremos las reservas
+        for (Reserva r : reservasSolapadas) {
+
+            // --- AQUÍ TIENES QUE REVISAR TU CLASE RESERVA ---
+            // Si te sigue dando error en .getHabitaciones(), es porque tu lista
+            // se llama diferente en Reserva.java.
+            // Opciones comunes: .getListaHabitaciones(), .getItems(), .getDetalles()
+
+            List<Habitacion> habitacionesDeEstaReserva = r.getHabitaciones();
+
+            if (habitacionesDeEstaReserva != null) {
+                for (Habitacion h : habitacionesDeEstaReserva) {
+
+                    // 3. CORRECCIÓN: Ahora esto funciona porque el mapa espera Integer
+                    reservasPorHab
+                            .computeIfAbsent(h.getId(), k -> new ArrayList<>())
+                            .add(r);
+                }
+            }
+        }
 
         List<GrillaHabitacionDTO> resultado = new ArrayList<>();
 

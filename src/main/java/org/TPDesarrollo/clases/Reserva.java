@@ -1,9 +1,11 @@
 package org.TPDesarrollo.clases;
 
 import jakarta.persistence.*;
-import org.TPDesarrollo.enums.EstadoHabitacion; // Asegúrate de importar tu Enum
+import org.TPDesarrollo.enums.EstadoHabitacion;
 
 import java.time.LocalDate;
+import java.util.ArrayList; // No olvides importar ArrayList
+import java.util.List;
 
 @Entity
 @Table(name = "reserva", schema = "pruebabdd")
@@ -23,6 +25,16 @@ public class Reserva {
     @Column(name = "id_persona")
     private Integer idPersona;
 
+    // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
+    // Debes declarar la lista y poner las anotaciones sobre ella.
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "reserva_habitacion",
+            joinColumns = @JoinColumn(name = "id_reserva"),
+            inverseJoinColumns = @JoinColumn(name = "id_habitacion")
+    )
+    private List<Habitacion> habitaciones = new ArrayList<>();
+
 
     public Reserva() {}
 
@@ -40,10 +52,8 @@ public class Reserva {
     public Integer getIdPersona() { return idPersona; }
     public void setIdPersona(Integer idPersona) { this.idPersona = idPersona; }
 
-    // --- GETTERS QUE FALTABAN PARA EL GESTOR ---
+    // --- MÉTODOS AUXILIARES ---
 
-    // Estos métodos actúan como alias para que tu GestorHabitacion no falle
-    // al llamar a getFechaIngreso()
     public LocalDate getFechaIngreso() {
         return this.ingreso;
     }
@@ -52,10 +62,17 @@ public class Reserva {
         return this.egreso;
     }
 
-    // Método lógico para determinar el estado.
-    // Si la reserva existe y está activa, asumimos que la habitación está 'OCUPADA' o 'RESERVADA'.
     public EstadoHabitacion getEstadoHabitacion() {
-        // Puedes cambiar esto a RESERVADA si prefieres mostrar ese color
         return EstadoHabitacion.OCUPADA;
+    }
+
+    // --- GETTER Y SETTER PARA LA LISTA ---
+
+    public List<Habitacion> getHabitaciones() {
+        return habitaciones;
+    }
+
+    public void setHabitaciones(List<Habitacion> habitaciones) {
+        this.habitaciones = habitaciones;
     }
 }
