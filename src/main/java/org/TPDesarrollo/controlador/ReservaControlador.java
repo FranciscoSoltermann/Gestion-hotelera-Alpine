@@ -39,4 +39,21 @@ public class ReservaControlador {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
         }
     }
+
+    @PostMapping("/ocupar")
+    public ResponseEntity<?> ocuparHabitacion(@Valid @RequestBody ReservaDTO dto) {
+        try {
+            // Llamamos al nuevo método del gestor
+            gestorReserva.crearOcupacion(dto);
+
+            Map<String, String> respuesta = new HashMap<>();
+            respuesta.put("mensaje", "Habitación ocupada con éxito (Check-in realizado)");
+
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error al ocupar: " + e.getMessage());
+        }
+    }
 }
