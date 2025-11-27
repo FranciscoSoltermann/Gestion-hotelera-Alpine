@@ -4,6 +4,7 @@ import org.TPDesarrollo.clases.Usuario;
 import org.TPDesarrollo.dtos.UsuarioDTO;
 import org.TPDesarrollo.exceptions.ContraseniaInvalida;
 import org.TPDesarrollo.exceptions.UsuarioExistente;
+import org.TPDesarrollo.exceptions.UsuarioNoEncontrado;
 import org.TPDesarrollo.repository.UsuarioRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,5 +73,41 @@ class GestorUsuarioTest {
 
         // When & Then
         assertThrows(ContraseniaInvalida.class, () -> gestorUsuario.autenticarUsuario("fran", "1234"));
+    }
+    @Test
+    void autenticarUsuario_DeberiaRetornarUsuario_SiCredencialesSonCorrectas() throws UsuarioNoEncontrado, ContraseniaInvalida {
+        // Given
+        String nombre = "fran";
+        String passIngresada = "12345";
+        String hashEnBd = "hash_valido";
+
+        Usuario usuarioEnBd = new Usuario();
+        usuarioEnBd.setNombre(nombre);
+        usuarioEnBd.setContrasenia(hashEnBd);
+
+        // Simulamos que el usuario existe
+        when(usuarioRepository.findByNombre(nombre)).thenReturn(Optional.of(usuarioEnBd));
+        // Simulamos que la contraseña coincide
+        when(passwordEncoder.matches(passIngresada, hashEnBd)).thenReturn(true);
+
+        // When
+        Usuario resultado = gestorUsuario.autenticarUsuario(nombre, passIngresada);
+
+        // Then
+        assertNotNull(resultado);
+        assertEquals(nombre, resultado.getNombre());
+    }
+
+    @Test
+    void autenticarUsuario_DeberiaLanzarExcepcion_SiUsuarioNoExiste() {
+        // Given
+        String nombre = "fantasma";
+        when(usuarioRepository.findByNombre(nombre)).thenReturn(Optional.empty());
+
+        // When & Then
+        // Necesitas importar tu excepción UsuarioNoEncontrado
+        assertThrows(org.TPDesarrollo.exceptions.UsuarioNoEncontrado.class, () -> {
+            gestorUsuario.autenticarUsuario(nombre, "cualquier_pass");
+        });
     }
 }
