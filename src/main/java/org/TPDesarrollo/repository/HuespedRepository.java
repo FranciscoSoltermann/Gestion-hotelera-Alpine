@@ -10,7 +10,7 @@ import java.util.List;
 public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
     boolean existsByCuit(String cuit);
     boolean existsByDocumento(String documento);
-
+    Huesped findByDocumento(String documento);
     @Query("SELECT h FROM Huesped h WHERE " +
             "(:apellido IS NULL OR :apellido = '' OR LOWER(h.apellido) LIKE LOWER(CONCAT('%', :apellido, '%'))) AND " +
             "(:nombre IS NULL OR :nombre = '' OR LOWER(h.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) AND " +
