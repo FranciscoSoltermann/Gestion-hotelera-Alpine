@@ -1,38 +1,30 @@
 package org.TPDesarrollo.clases;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Habitacion {
+@Table(name = "habitacion", schema = "pruebabdd")
+public class Habitacion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hab_seq")
-    @SequenceGenerator(name = "hab_seq", sequenceName = "habitacion_id_habitacion_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_habitacion")
     private Integer id;
 
-    @Column(name = "numero")
+    @Column(name = "numero", unique = true)
     private String numero;
+
+    // --- AGREGAR ESTO ---
+    @Column(name = "capacidad")
+    private Integer capacidad;
+    // --------------------
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado")
     private EstadoHabitacion estado;
-
-    @Column(name = "costo")
-    private Double costo;
-
-    @Column(name = "capacidad")
-    private Integer capacidad;
-
-    @Column(name = "cama_ind")
-    private Integer camaInd;
-
-    @Column(name = "cama_doble")
-    private Integer camaDoble;
 
     @Column(name = "ingreso")
     private LocalDate ingreso;
@@ -40,44 +32,23 @@ public abstract class Habitacion {
     @Column(name = "egreso")
     private LocalDate egreso;
 
-    // --- CORRECCIÓN IMPORTANTE ---
-    // Una habitación puede pertenecer a UNA sola reserva (Many-to-One)
-    @ManyToOne
-    @JoinColumn(name = "id_reserva")
-    @JsonIgnore
-    private Reserva reservaActual;
+    public Habitacion() {}
 
-    public Habitacion() {
-    }
-
-    // --- GETTERS Y SETTERS ---
+    // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-
     public String getNumero() { return numero; }
     public void setNumero(String numero) { this.numero = numero; }
 
-    public EstadoHabitacion getEstado() { return estado; }
-    public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
-
-    public Double getCosto() { return costo; }
-    public void setCosto(Double costo) { this.costo = costo; }
-
+    // --- AGREGAR GETTER Y SETTER DE CAPACIDAD ---
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
+    // --------------------------------------------
 
-    public Integer getCamaInd() { return camaInd; }
-    public void setCamaInd(Integer camaInd) { this.camaInd = camaInd; }
-
-    public Integer getCamaDoble() { return camaDoble; }
-    public void setCamaDoble(Integer camaDoble) { this.camaDoble = camaDoble; }
-
+    public EstadoHabitacion getEstado() { return estado; }
+    public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
     public LocalDate getIngreso() { return ingreso; }
     public void setIngreso(LocalDate ingreso) { this.ingreso = ingreso; }
-
     public LocalDate getEgreso() { return egreso; }
     public void setEgreso(LocalDate egreso) { this.egreso = egreso; }
-
-    public Reserva getReservaActual() { return reservaActual; }
-    public void setReservaActual(Reserva reservaActual) { this.reservaActual = reservaActual; }
 }

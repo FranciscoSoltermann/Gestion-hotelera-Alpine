@@ -47,18 +47,18 @@ public class GestorHabitacion {
         // Agrupar reservas por ID de habitación para acceso rápido
         Map<Integer, List<Reserva>> reservasPorHab = new HashMap<>();
 
+        // --- CORRECCIÓN PRINCIPAL: Adaptado a la nueva entidad Reserva (ManyToOne) ---
         for (Reserva r : reservasSolapadas) {
-            // Asegúrate que tu getter en Reserva sea getHabitaciones()
-            List<Habitacion> habitacionesDeEstaReserva = r.getHabitaciones();
+            // Ya no es una lista, es una sola habitación por reserva
+            Habitacion h = r.getHabitacion();
 
-            if (habitacionesDeEstaReserva != null) {
-                for (Habitacion h : habitacionesDeEstaReserva) {
-                    reservasPorHab
-                            .computeIfAbsent(h.getId(), k -> new ArrayList<>())
-                            .add(r);
-                }
+            if (h != null) {
+                reservasPorHab
+                        .computeIfAbsent(h.getId(), k -> new ArrayList<>())
+                        .add(r);
             }
         }
+        // -----------------------------------------------------------------------------
 
         List<GrillaHabitacionDTO> resultado = new ArrayList<>();
 
@@ -84,8 +84,9 @@ public class GestorHabitacion {
 
                 if (reservas != null) {
                     for (Reserva r : reservas) {
-                        // Verificamos si el día cae dentro del rango de la reserva
-                        boolean dentro = !dia.isBefore(r.getFechaIngreso()) && !dia.isAfter(r.getFechaEgreso());
+                        // CORRECCIÓN LÓGICA: El día de salida (egreso) debe quedar LIBRE.
+                        // Usamos dia.isBefore(egreso) en lugar de !dia.isAfter(egreso)
+                        boolean dentro = !dia.isBefore(r.getFechaIngreso()) && dia.isBefore(r.getFechaEgreso());
 
                         if (dentro) {
                             estadoDelDia = r.getEstadoHabitacion();
@@ -97,21 +98,17 @@ public class GestorHabitacion {
                 // -----------------------------------------------------------
                 // 2. VERIFICAR ESTADO PROPIO DE LA HABITACIÓN (Mantenimiento)
                 // -----------------------------------------------------------
-                // Si no hay reserva (sigue DISPONIBLE), chequeamos si la habitación
-                // tiene un bloqueo administrativo (ej. MANTENIMIENTO)
                 if (estadoDelDia == EstadoHabitacion.DISPONIBLE) {
 
-                    // Si el estado general en BD NO es disponible (ej: MANTENIMIENTO)
                     if (hab.getEstado() != EstadoHabitacion.DISPONIBLE) {
 
-                        // Validamos las fechas de la habitación (ingreso/egreso en la tabla Habitacion)
                         if (hab.getIngreso() != null && hab.getEgreso() != null) {
-                            // Si el día actual está dentro del rango de mantenimiento
-                            if (!dia.isBefore(hab.getIngreso()) && !dia.isAfter(hab.getEgreso())) {
-                                estadoDelDia = hab.getEstado(); // Asignamos MANTENIMIENTO
+                            // Misma corrección para mantenimiento: liberar el día final
+                            if (!dia.isBefore(hab.getIngreso()) && dia.isBefore(hab.getEgreso())) {
+                                estadoDelDia = hab.getEstado();
                             }
                         } else {
-                            // Si está en MANTENIMIENTO pero no tiene fechas, asumimos bloqueo total
+                            // Bloqueo total (sin fechas)
                             estadoDelDia = hab.getEstado();
                         }
                     }
