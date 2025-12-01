@@ -1,5 +1,6 @@
 package org.TPDesarrollo.dtos;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.LocalDate;
@@ -10,9 +11,11 @@ public class ReservaDTO {
     private Integer id;
 
     @NotNull(message = "La fecha de ingreso es obligatoria")
+    @FutureOrPresent (message = "La fecha de Ingreso debe ser a partir del dia de hoy.")
     private LocalDate ingreso;
 
     @NotNull(message = "La fecha de egreso es obligatoria")
+    @FutureOrPresent (message = "La fecha de Egreso debe ser a partir del dia de hoy.")
     private LocalDate egreso;
 
     // ELIMINADO: private Integer idPersona; (El frontend manda un objeto, no un ID suelto)
