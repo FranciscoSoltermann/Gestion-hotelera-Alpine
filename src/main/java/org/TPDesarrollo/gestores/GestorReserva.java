@@ -86,20 +86,26 @@ public class GestorReserva {
             if (mapaOcupantes != null && mapaOcupantes.containsKey(h.getId())) {
                 List<OcupanteDTO> listaDTOs = mapaOcupantes.get(h.getId());
 
-                // Opcional: Validar capacidad aquí si quieres ser estricto
-                // if (listaDTOs.size() > h.getCapacidad()) throw ...
-
                 for (OcupanteDTO oDto : listaDTOs) {
-                    // Solo agregamos si tiene nombre (evitar filas vacías)
+                    // Solo procesamos si tiene nombre
                     if (oDto.getNombre() != null && !oDto.getNombre().isBlank()) {
+
                         Ocupante ocupante = new Ocupante();
                         ocupante.setNombre(oDto.getNombre());
                         ocupante.setApellido(oDto.getApellido());
 
-                        // Usamos el método puente setDni (que llama a setDocumento en Persona)
+                        // Asignamos el DNI (usando tu método setDni o setDocumento)
                         ocupante.setDni(oDto.getDni());
 
-                        // Método helper que vincula la Reserva al Ocupante
+                        // ✅ CORRECCIÓN CRÍTICA 1: Valores por defecto
+                        ocupante.setTelefono("-");
+                        ocupante.setTipoDocumento(TipoDocumento.DNI);
+
+                        // ✅ CORRECCIÓN CRÍTICA 2: Asignar la habitación explícitamente
+                        // Esta línea es la que hace que se guarde el ID en la base de datos
+                        ocupante.setHabitacion(h);
+
+                        // Vinculamos con la reserva
                         r.agregarOcupante(ocupante);
                     }
                 }

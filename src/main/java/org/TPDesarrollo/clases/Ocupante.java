@@ -4,14 +4,17 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ocupante", schema = "pruebabdd")
-@PrimaryKeyJoinColumn(name = "id_ocupante") // Vincula el ID de Ocupante con el ID de Persona
+@PrimaryKeyJoinColumn(name = "id_persona")
 public class Ocupante extends Persona {
-
-    // Ya NO definimos id, nombre, apellido, dni aquí porque se heredan de Persona.
 
     @ManyToOne
     @JoinColumn(name = "id_reserva")
     private Reserva reserva;
+
+    // ✅ NUEVO: Agregamos esto para conectar con la tabla Habitacion
+    @ManyToOne
+    @JoinColumn(name = "id_habitacion")
+    private Habitacion habitacion;
 
     public Ocupante() {
         super();
@@ -21,19 +24,20 @@ public class Ocupante extends Persona {
         super();
         this.setNombre(nombre);
         this.setApellido(apellido);
-        // Asumo que Persona usa 'documento'. Si usa 'dni', cámbialo aquí.
         this.setDocumento(dni);
         this.reserva = reserva;
     }
 
-    // --- GETTERS Y SETTERS PROPIOS ---
+    // --- GETTERS Y SETTERS ---
 
     public Reserva getReserva() { return reserva; }
     public void setReserva(Reserva reserva) { this.reserva = reserva; }
 
-    // --- MÉTODOS PUENTE (Para compatibilidad con tu código actual) ---
-    // Si tu DTO y Gestor usan "getDni/setDni" pero Persona usa "getDocumento",
-    // estos métodos hacen la traducción automática.
+    // ✅ NUEVO: Getters y Setters para Habitacion
+    public Habitacion getHabitacion() { return habitacion; }
+    public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
+
+    // --- MÉTODOS PUENTE ---
 
     public String getDni() {
         return this.getDocumento();

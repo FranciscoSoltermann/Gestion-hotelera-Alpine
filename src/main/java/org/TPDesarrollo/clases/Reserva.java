@@ -39,6 +39,11 @@ public class Reserva {
     @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ocupante> ocupantes = new ArrayList<>();
 
+    // Asegúrate de tener este método helper
+    public void agregarOcupante(Ocupante ocupante) {
+        ocupantes.add(ocupante);
+        ocupante.setReserva(this);
+    }
     public Reserva() {}
 
     // --- GETTERS Y SETTERS ---
@@ -69,14 +74,6 @@ public class Reserva {
 
     public void setOcupantes(List<Ocupante> ocupantes) {
         this.ocupantes = ocupantes;
-    }
-
-    // Método helper para mantener la consistencia bidireccional
-    public void agregarOcupante(Ocupante ocupante) {
-        if (ocupante != null) {
-            ocupante.setReserva(this); // Vincula el ocupante a esta reserva
-            this.ocupantes.add(ocupante);
-        }
     }
 
 
