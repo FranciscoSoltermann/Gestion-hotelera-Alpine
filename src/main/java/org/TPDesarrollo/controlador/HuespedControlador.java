@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/huespedes")
+@CrossOrigin(origins = "http://localhost:3000") // Permite peticiones desde React
 public class HuespedControlador {
 
     private final GestorHuesped gestorHuesped;
@@ -30,7 +31,7 @@ public class HuespedControlador {
         return ResponseEntity.status(HttpStatus.CREATED).body(huespedGuardado);
     }
 
-    // --- 2. BÚSQUEDA (GET con filtros) ---
+    // --- 2. BÚSQUEDA GENERAL (GET con filtros) ---
     @GetMapping("/buscar")
     public ResponseEntity<List<HuespedDTO>> buscarHuespedes(
             @RequestParam(required = false) String apellido,
@@ -44,8 +45,24 @@ public class HuespedControlador {
         return ResponseEntity.ok(huespedes);
     }
 
-    // --- 3. OBTENER POR ID (GET /{id}) --- (¡NUEVO!)
-    // Este usa 'obtenerHuespedSeleccionado' del Gestor
+    // --- NUEVO: BÚSQUEDA EXACTA POR DNI (GET) ---
+    @GetMapping("/buscar-por-dni")
+    public ResponseEntity<?> buscarPorDni(@RequestParam("dni") String dni) {
+        try {
+            HuespedDTO huesped = gestorHuesped.buscarPorDni(dni);
+
+            if (huesped != null) {
+                return ResponseEntity.ok(huesped);
+            } else {
+                // Devolvemos 404 Not Found si no existe, para que el front sepa que debe dejar escribir
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al buscar: " + e.getMessage());
+        }
+    }
+
+    // --- 3. OBTENER POR ID (GET /{id}) ---
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerPorId(@PathVariable Integer id) {
         HuespedDTO huesped = gestorHuesped.obtenerHuespedSeleccionado(id);
@@ -56,17 +73,14 @@ public class HuespedControlador {
         return ResponseEntity.ok(huesped);
     }
 
-    // --- 4. MODIFICAR (PUT) --- (¡NUEVO!)
-    // Este usa 'modificarHuesped' del Gestor
+    // --- 4. MODIFICAR (PUT) ---
     @PutMapping("/modificar")
     public ResponseEntity<?> modificarHuesped(@Valid @RequestBody HuespedDTO huespedDTO) {
-        // Se asume que el DTO viene con el ID del huésped a modificar
         gestorHuesped.modificarHuesped(huespedDTO);
         return ResponseEntity.ok("Huésped modificado correctamente");
     }
 
-    // --- 5. DAR DE BAJA (DELETE) --- (¡NUEVO!)
-    // Este usa 'darDeBajaHuesped' del Gestor
+    // --- 5. DAR DE BAJA (DELETE) ---
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarHuesped(@PathVariable Integer id) {
         gestorHuesped.darDeBajaHuesped(id);

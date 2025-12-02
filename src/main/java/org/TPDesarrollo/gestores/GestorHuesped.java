@@ -28,8 +28,20 @@ public class GestorHuesped {
         this.huespedRepository = huespedRepository;
     }
 
+    // --- NUEVO: BUSCAR POR DNI EXACTO (Para el formulario de Reserva) ---
+    @Transactional(readOnly = true)
+    public HuespedDTO buscarPorDni(String dni) {
+        // Usamos el método que ya tienes en tu repositorio
+        Huesped huesped = huespedRepository.findByDocumento(dni);
+
+        if (huesped != null) {
+            return convertirA_DTO(huesped);
+        }
+        return null;
+    }
+
     // ==========================================================
-    // BUSCAR HUESPEDES
+    // BUSCAR HUESPEDES (Búsqueda general por filtros)
     // ==========================================================
 
     @Transactional(readOnly = true)
@@ -57,7 +69,7 @@ public class GestorHuesped {
     }
 
     // ==========================================================
-    // OBTENER UN HUESPED
+    // OBTENER UN HUESPED POR ID
     // ==========================================================
 
     @Transactional(readOnly = true)
@@ -97,9 +109,7 @@ public class GestorHuesped {
 
     @Transactional
     public void modificarHuesped(HuespedDTO dto) {
-
         Huesped entidad = convertirA_Entidad(dto);
-
         huespedRepository.save(entidad);
     }
 
@@ -162,7 +172,6 @@ public class GestorHuesped {
         }
 
         Huesped huesped = Huesped.builder()
-
                 // --- PERSONA ---
                 .nombre(dto.getNombre())
                 .apellido(dto.getApellido())
@@ -173,12 +182,10 @@ public class GestorHuesped {
                 .nacionalidad(dto.getNacionalidad())
                 .fechaNacimiento(dto.getFechaNacimiento())
                 .direccion(direccionEntidad)
-
                 // --- HUESPED ---
                 .cuit(dto.getCuit())
                 .ocupacion(dto.getOcupacion())
                 .posicionIVA(dto.getPosicionIVA())
-
                 .build();
 
         // si es modificación

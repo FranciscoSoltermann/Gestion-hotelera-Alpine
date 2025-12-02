@@ -1,8 +1,10 @@
 package org.TPDesarrollo.clases;
 
 import jakarta.persistence.*;
-import org.TPDesarrollo.enums.EstadoHabitacion; // O el enum que uses para estado reserva
+import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reserva", schema = "pruebabdd")
@@ -19,20 +21,28 @@ public class Reserva {
     @Column(name = "egreso")
     private LocalDate egreso;
 
+    // Este es el ID del titular (quien paga/hace la reserva)
     @Column(name = "id_persona")
     private Integer idPersona;
 
     @Column(name = "estado")
-    private String estado; // Para guardar "RESERVADA" o "OCUPADA"
+    private String estado;
 
-    // --- CAMBIO CLAVE: La reserva sabe de qué habitación es ---
     @ManyToOne
-    @JoinColumn(name = "id_habitacion") // Esto conecta con tu columna de la foto
+    @JoinColumn(name = "id_habitacion")
     private Habitacion habitacion;
+
+    // --- NUEVO: LISTA DE OCUPANTES ---
+    // mappedBy = "reserva" se refiere al atributo 'reserva' en la clase Ocupante
+    // CascadeType.ALL: Si guardas la reserva, se guardan los ocupantes.
+    // orphanRemoval = true: Si borras un ocupante de la lista, se borra de la BD.
+    @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ocupante> ocupantes = new ArrayList<>();
 
     public Reserva() {}
 
     // --- GETTERS Y SETTERS ---
+
     public Integer getId() { return id_reserva; }
     public void setId(Integer id) { this.id_reserva = id; }
 
@@ -51,10 +61,27 @@ public class Reserva {
     public Habitacion getHabitacion() { return habitacion; }
     public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
 
-    // Métodos auxiliares de fecha
+    // --- GETTERS Y SETTERS PARA OCUPANTES ---
+
+    public List<Ocupante> getOcupantes() {
+        return ocupantes;
+    }
+
+    public void setOcupantes(List<Ocupante> ocupantes) {
+        this.ocupantes = ocupantes;
+    }
+
+    // Método helper para mantener la consistencia bidireccional
+    public void agregarOcupante(Ocupante ocupante) {
+        if (ocupante != null) {
+            ocupante.setReserva(this); // Vincula el ocupante a esta reserva
+            this.ocupantes.add(ocupante);
+        }
+    }
+
+
     public LocalDate getFechaIngreso() { return ingreso; }
     public LocalDate getFechaEgreso() { return egreso; }
-
 
     public EstadoHabitacion getEstadoHabitacion() {
         try {

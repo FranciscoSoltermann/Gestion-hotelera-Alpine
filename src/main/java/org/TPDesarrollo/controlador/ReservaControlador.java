@@ -18,7 +18,6 @@ public class ReservaControlador {
         this.gestorReserva = gestorReserva;
     }
 
-    // Endpoint para botón VERDE (Reservar)
     @PostMapping
     public ResponseEntity<?> crearReserva(@Valid @RequestBody ReservaDTO dto) {
         try {
@@ -28,11 +27,13 @@ public class ReservaControlador {
             return ResponseEntity.ok(respuesta);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+            // --- CORRECCIÓN: Devolvemos JSON también en el error ---
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("mensaje", e.getMessage()); // Pasamos el mensaje real al front
+            return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
 
-    // Endpoint para botón AZUL (Ocupar/Check-in)
     @PostMapping("/ocupar")
     public ResponseEntity<?> ocuparHabitacion(@Valid @RequestBody ReservaDTO dto) {
         try {
@@ -42,7 +43,10 @@ public class ReservaControlador {
             return ResponseEntity.ok(respuesta);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+            // --- CORRECCIÓN: Devolvemos JSON también en el error ---
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("mensaje", e.getMessage());
+            return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
 }
