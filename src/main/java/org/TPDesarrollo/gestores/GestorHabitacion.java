@@ -68,7 +68,7 @@ public class GestorHabitacion {
             fila.setIdHabitacion(hab.getId());
             fila.setNumero(hab.getNumero());
             fila.setTipo(hab.getClass().getSimpleName());
-
+            fila.setCapacidad(hab.getCapacidad());
             List<EstadoDiaDTO> estados = new ArrayList<>();
             LocalDate dia = fechaDesde;
 
