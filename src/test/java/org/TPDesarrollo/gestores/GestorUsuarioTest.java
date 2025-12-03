@@ -42,10 +42,10 @@ class GestorUsuarioTest {
         usuarioGuardado.setNombre("fran");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioGuardado);
 
-        // When
+
         Usuario resultado = gestorUsuario.registrarUsuario(dto);
 
-        // Then
+
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());
         verify(usuarioRepository).save(any(Usuario.class));
@@ -57,7 +57,7 @@ class GestorUsuarioTest {
         UsuarioDTO dto = new UsuarioDTO("fran", "12345");
         when(usuarioRepository.findByNombre("fran")).thenReturn(Optional.of(new Usuario()));
 
-        // When & Then
+
         assertThrows(UsuarioExistente.class, () -> gestorUsuario.registrarUsuario(dto));
         verify(usuarioRepository, never()).save(any(Usuario.class));
     }
@@ -71,7 +71,7 @@ class GestorUsuarioTest {
         when(usuarioRepository.findByNombre("fran")).thenReturn(Optional.of(usuarioEnBd));
         when(passwordEncoder.matches("1234", "hash_real")).thenReturn(false);
 
-        // When & Then
+
         assertThrows(ContraseniaInvalida.class, () -> gestorUsuario.autenticarUsuario("fran", "1234"));
     }
     @Test
@@ -105,7 +105,7 @@ class GestorUsuarioTest {
         when(usuarioRepository.findByNombre(nombre)).thenReturn(Optional.empty());
 
         // When & Then
-        // Necesitas importar tu excepción UsuarioNoEncontrado
+
         assertThrows(org.TPDesarrollo.exceptions.UsuarioNoEncontrado.class, () -> {
             gestorUsuario.autenticarUsuario(nombre, "cualquier_pass");
         });

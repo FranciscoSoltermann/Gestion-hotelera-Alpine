@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Controlador REST para gestionar las habitaciones y sus estados.
+ */
 @RestController
 @RequestMapping("/api/habitaciones")
-// Ajusta el puerto según donde corra tu React/Frontend
+// Ajusta el puerto según donde corra el React/Frontend
 @CrossOrigin(origins = "http://localhost:3000")
 public class HabitacionControlador {
 
@@ -23,14 +26,14 @@ public class HabitacionControlador {
         this.gestorHabitacion = gestorHabitacion;
     }
 
-    // Endpoint: GET /api/habitaciones/estado?desde=2023-10-01&hasta=2023-10-15
+    // Endpoint para obtener el estado de las habitaciones en un rango de fechas
     @GetMapping("/estado")
     public ResponseEntity<?> obtenerEstado(
             @RequestParam("desde") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
             @RequestParam("hasta") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta) {
 
         try {
-            // Llama al gestor siguiendo el diagrama de secuencia [cite: 22]
+            // Llama al gestor siguiendo el diagrama de secuencia
             List<GrillaHabitacionDTO> resultado = gestorHabitacion.obtenerEstadoHabitaciones(fechaDesde, fechaHasta);
             return ResponseEntity.ok(resultado);
         } catch (IllegalArgumentException e) {

@@ -37,7 +37,6 @@ class HuespedControladorTest {
         dto.setNombre("Test");
         dto.setApellido("Test");
         dto.setDocumento("11111111");
-        // ... llenar el resto si @Valid salta ...
 
         // Simulamos que el Gestor lanza la excepción de negocio
         when(gestorHuesped.darDeAltaHuesped(any(HuespedDTO.class)))

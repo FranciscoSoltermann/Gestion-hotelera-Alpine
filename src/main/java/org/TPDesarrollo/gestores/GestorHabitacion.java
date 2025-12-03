@@ -17,6 +17,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Servicio para gestionar las habitaciones y sus estados.
+ * Proporciona funcionalidades para obtener el estado de las habitaciones
+ * en un rango de fechas determinado.
+ * Implementa la lógica de negocio relacionada con las habitaciones.
+ * Utiliza repositorios para acceder a los datos de habitaciones y reservas.
+ * Los métodos están anotados con @Transactional
+ * para gestionar las transacciones de la base de datos.
+ * Los estados posibles de las habitaciones incluyen DISPONIBLE,
+ * OCUPADO, RESERVADO y MANTENIMIENTO.
+ * El servicio valida las fechas de entrada y salida
+ * para asegurar que sean correctas antes de procesar la solicitud.
+ * Devuelve una lista de DTOs que representan el estado diario
+ * de cada habitación en el rango especificado.
+ */
 @Service
 public class GestorHabitacion {
 
@@ -30,6 +45,13 @@ public class GestorHabitacion {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Obtiene el estado de todas las habitaciones en un rango de fechas.
+     * @param fechaDesde Fecha de inicio del rango.
+     * @param fechaHasta Fecha de fin del rango.
+     * @return Lista de GrillaHabitacionDTO con el estado diario de cada habitación.
+     * @throws IllegalArgumentException Si las fechas son nulas o inválidas.
+     */
     public List<GrillaHabitacionDTO> obtenerEstadoHabitaciones(LocalDate fechaDesde, LocalDate fechaHasta) {
 
         if (fechaDesde == null || fechaHasta == null)
@@ -38,18 +60,13 @@ public class GestorHabitacion {
         if (fechaDesde.isAfter(fechaHasta))
             throw new IllegalArgumentException("La fecha desde no puede ser posterior a hasta");
 
-        // 1) Traer todas las habitaciones
         List<Habitacion> todas = habitacionRepository.findAll();
-
-        // 2) Traer reservas en el rango (de clientes)
         List<Reserva> reservasSolapadas = reservaRepository.encontrarReservasEnRango(fechaDesde, fechaHasta);
 
         // Agrupar reservas por ID de habitación para acceso rápido
         Map<Integer, List<Reserva>> reservasPorHab = new HashMap<>();
 
-        // --- CORRECCIÓN PRINCIPAL: Adaptado a la nueva entidad Reserva (ManyToOne) ---
         for (Reserva r : reservasSolapadas) {
-            // Ya no es una lista, es una sola habitación por reserva
             Habitacion h = r.getHabitacion();
 
             if (h != null) {
@@ -58,7 +75,6 @@ public class GestorHabitacion {
                         .add(r);
             }
         }
-        // -----------------------------------------------------------------------------
 
         List<GrillaHabitacionDTO> resultado = new ArrayList<>();
 
@@ -71,44 +87,29 @@ public class GestorHabitacion {
             fila.setCapacidad(hab.getCapacidad());
             List<EstadoDiaDTO> estados = new ArrayList<>();
             LocalDate dia = fechaDesde;
-
-            // Recorremos día a día en el rango solicitado
             while (!dia.isAfter(fechaHasta)) {
 
                 EstadoHabitacion estadoDelDia = EstadoHabitacion.DISPONIBLE;
 
-                // -----------------------------------------------------------
-                // 1. VERIFICAR RESERVAS (Prioridad 1: Clientes)
-                // -----------------------------------------------------------
                 List<Reserva> reservas = reservasPorHab.get(hab.getId());
 
                 if (reservas != null) {
                     for (Reserva r : reservas) {
-                        // CORRECCIÓN LÓGICA: El día de salida (egreso) debe quedar LIBRE.
-                        // Usamos dia.isBefore(egreso) en lugar de !dia.isAfter(egreso)
                         boolean dentro = !dia.isBefore(r.getFechaIngreso()) && dia.isBefore(r.getFechaEgreso());
-
                         if (dentro) {
                             estadoDelDia = r.getEstadoHabitacion();
                             break;
                         }
                     }
                 }
-
-                // -----------------------------------------------------------
-                // 2. VERIFICAR ESTADO PROPIO DE LA HABITACIÓN (Mantenimiento)
-                // -----------------------------------------------------------
                 if (estadoDelDia == EstadoHabitacion.DISPONIBLE) {
 
                     if (hab.getEstado() != EstadoHabitacion.DISPONIBLE) {
-
                         if (hab.getIngreso() != null && hab.getEgreso() != null) {
-                            // Misma corrección para mantenimiento: liberar el día final
                             if (!dia.isBefore(hab.getIngreso()) && dia.isBefore(hab.getEgreso())) {
                                 estadoDelDia = hab.getEstado();
                             }
                         } else {
-                            // Bloqueo total (sin fechas)
                             estadoDelDia = hab.getEstado();
                         }
                     }

@@ -4,10 +4,17 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 
-
+/**
+ * Validador personalizado para la anotación @ValidPassword.
+ * Implementa las reglas de validación para contraseñas:
+ * 1. Al menos 5 letras y 3 números.
+ * 2. No más de 2 números idénticos consecutivos.
+ * 3. No más de 2 números consecutivos en secuencia ascendente o descendente.
+ */
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
 
     @Override
+    // Método principal de validación
     public boolean isValid(String password, ConstraintValidatorContext context) {
         if (password == null || password.isEmpty()) {
             return false; // Puedes usar @NotBlank para esto, pero es bueno tenerlo
@@ -19,13 +26,14 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
                 .mapToObj(c -> (char) c)
                 .toList();
 
+        // Convertimos caracteres numéricos a enteros
         List<Integer> numeros = password.chars()
                 .filter(Character::isDigit)
                 .map(Character::getNumericValue) // Convierte '1' a 1
                 .boxed()
                 .toList();
 
-        // --- 1. Revisar longitudes ---
+        //Revisar longitudes
         if (letras.size() < 5) {
             setErrorMessage(context, "La contraseña debe tener al menos 5 letras.");
             return false;
@@ -35,13 +43,13 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
             return false;
         }
 
-        // --- 2. Revisar números idénticos (ej. "777") ---
+        //Revisar números idénticos
         if (numeros.stream().distinct().count() == 1) {
             setErrorMessage(context, "Los números no pueden ser todos iguales (ej. '333').");
             return false;
         }
 
-        // --- 3. Revisar números consecutivos (ej. "123" o "321") ---
+        //Revisar números consecutivos
         for (int i = 0; i < numeros.size() - 2; i++) {
             int n1 = numeros.get(i);
             int n2 = numeros.get(i + 1);
@@ -57,7 +65,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
             }
         }
 
-        return true; // ¡Válida!
+        return true;
     }
 
     // Método auxiliar para establecer mensajes de error personalizados

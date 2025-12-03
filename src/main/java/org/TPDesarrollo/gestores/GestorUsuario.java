@@ -11,7 +11,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * Servicio para la gestión de usuarios.
+ * Proporciona métodos para autenticar y registrar usuarios.
+ * Utiliza UsuarioRepository para interactuar con la base de datos.
+ * Incluye manejo de excepciones para casos de usuario no encontrado y contraseña inválida.
+ * Incorpora seguridad al encriptar contraseñas utilizando PasswordEncoder.
+ * @Service indica que esta clase es un servicio de Spring.
+ */
 @Service
 public class GestorUsuario {
 
@@ -19,44 +26,45 @@ public class GestorUsuario {
     private final PasswordEncoder passwordEncoder; // <-- Inyectamos el codificador
 
     @Autowired
+    // Constructor con inyección de dependencias
     public GestorUsuario(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
-    // 1. CAMBIO: De 'void' a 'Usuario'
+    // Método para autenticar un usuario
     public Usuario autenticarUsuario(String nombre, String contrasenia) throws UsuarioNoEncontrado, ContraseniaInvalida {
 
-        // 1. Buscamos el usuario
+        //Buscamos el usuario
         Usuario usuarioAlmacenado = usuarioRepository.findByNombre(nombre)
                 .orElseThrow(() -> new UsuarioNoEncontrado("Usuario no encontrado: " + nombre));
 
-        // 2. ¡SEGURIDAD! Comparamos la contraseña
+        //Comparamos la contraseña
         if (!passwordEncoder.matches(contrasenia, usuarioAlmacenado.getContrasenia())) {
             throw new ContraseniaInvalida("Contraseña incorrecta.");
         }
 
-        // 3. CAMBIO: ¡Devolvemos el usuario encontrado!
+        //Devolvemos el usuario encontrado
         return usuarioAlmacenado;
     }
 
     @Transactional
     public Usuario registrarUsuario(UsuarioDTO datos) {
-        // 1. Verifica si el usuario ya existe
+        //Verifica si el usuario ya existe
         if (usuarioRepository.findByNombre(datos.getNombre()).isPresent()) {
             throw new UsuarioExistente("El nombre de usuario '" + datos.getNombre() + "' ya existe.");
         }
 
-        // 2. Crea el nuevo usuario usando el BUILDER (¡Mucho más limpio!)
+        //Crea el nuevo usuario usando el BUILDER
         Usuario nuevoUsuario = Usuario.builder()
                 .nombre(datos.getNombre())
-                // ¡SEGURIDAD! Encriptamos la contraseña antes de guardarla
+                //Encriptamos la contraseña antes de guardarla
                 .contrasenia(passwordEncoder.encode(datos.getContrasenia()))
-                .rol("ADMIN") // O "USER", según tu lógica
+                .rol("ADMIN")
                 .build();
 
-        // 3. Guarda y devuelve el usuario
+        //Guarda y devuelve el usuario
         return usuarioRepository.save(nuevoUsuario);
     }
 }

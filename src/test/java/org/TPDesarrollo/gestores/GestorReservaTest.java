@@ -33,7 +33,7 @@ public class GestorReservaTest {
     @InjectMocks
     private GestorReserva gestorReserva;
 
-    // --- TEST 1: CAMINO FELIZ ---
+
     @Test
     void crearReserva_DatosValidos_DeberiaGuardarReserva() {
         // GIVEN
@@ -49,7 +49,7 @@ public class GestorReservaTest {
         datosHuesped.setTipoDocumento("DNI");
         dto.setHuesped(datosHuesped);
 
-        // ⭐ CORRECCIÓN AQUÍ: Agregamos {} al final para instanciar la abstracta
+
         Habitacion habitacionMock = new Habitacion() {};
         habitacionMock.setId(1);
         habitacionMock.setNumero("101");
@@ -76,7 +76,7 @@ public class GestorReservaTest {
         verify(reservaRepository, times(1)).save(any(Reserva.class));
     }
 
-    // --- TEST 2: ERROR DE FECHAS ---
+
     @Test
     void crearReserva_FechaIngresoPosteriorAEgreso_DeberiaLanzarExcepcion() {
         ReservaDTO dto = new ReservaDTO();
@@ -90,7 +90,7 @@ public class GestorReservaTest {
         assertEquals("La fecha de ingreso debe ser anterior al egreso", exception.getMessage());
     }
 
-    // --- TEST 3: HABITACIÓN OCUPADA ---
+
     @Test
     void crearReserva_HabitacionOcupada_DeberiaLanzarExcepcion() {
         LocalDate ingreso = LocalDate.of(2025, 1, 10);
@@ -101,7 +101,7 @@ public class GestorReservaTest {
         dto.setEgreso(egreso);
         dto.setHabitaciones(List.of(1));
 
-        // ⭐ CORRECCIÓN AQUÍ TAMBIÉN: Agregamos {}
+
         Habitacion habitacionOcupada = new Habitacion() {};
         habitacionOcupada.setId(1);
         habitacionOcupada.setNumero("101");

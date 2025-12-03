@@ -16,46 +16,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * GestorReserva
+ * Clase de servicio que maneja la lógica de negocio relacionada con reservas y ocupaciones de habitaciones.
+ * Proporciona métodos para crear reservas y ocupaciones, validando disponibilidad y gestionando datos
+ * de huéspedes y ocupantes.
+ * Utiliza repositorios para interactuar con la base de datos.
+ * Contiene lógica para validar fechas, verificar disponibilidad de habitaciones,
+ * y gestionar la creación de reservas y ocupantes asociados.
+ */
 @Service
 public class GestorReserva {
 
     private final HabitacionRepository habitacionRepository;
     private final ReservaRepository reservaRepository;
     private final HuespedRepository huespedRepository;
-
+    // Constructor con inyección de dependencias
     public GestorReserva(HabitacionRepository hr, ReservaRepository rr, HuespedRepository phr) {
         this.habitacionRepository = hr;
         this.reservaRepository = rr;
         this.huespedRepository = phr;
     }
 
-    // 1. RESERVAR
+    //RESERVAR
     @Transactional
     public List<Reserva> crearReserva(ReservaDTO dto) {
         return procesarReserva(dto, "RESERVADA");
     }
 
-    // 2. OCUPAR (CHECK-IN)
+    //OCUPAR (CHECK-IN)
     @Transactional
     public List<Reserva> crearOcupacion(ReservaDTO dto) {
         return procesarReserva(dto, "OCUPADA");
     }
 
-    // --- LÓGICA CENTRAL ---
+    // Lógica común para reservar u ocupar
     private List<Reserva> procesarReserva(ReservaDTO dto, String estadoNuevo) {
 
-        // 1. Validar fechas
+        //Validar fechas
         if (dto.getIngreso().isAfter(dto.getEgreso())) {
             throw new IllegalArgumentException("La fecha de ingreso debe ser anterior al egreso");
         }
 
-        // 2. Obtener Habitaciones solicitadas
+        //Obtener Habitaciones solicitadas
         List<Habitacion> habitaciones = habitacionRepository.findAllById(dto.getHabitaciones());
         if (habitaciones.size() != dto.getHabitaciones().size()) {
             throw new RuntimeException("Alguna habitación solicitada no existe");
         }
 
-        // 3. VALIDAR DISPONIBILIDAD
+        //VALIDAR DISPONIBILIDAD
         for (Habitacion h : habitaciones) {
             List<Reserva> conflictos = reservaRepository.encontrarSolapamientos(
                     h.getId(), dto.getIngreso(), dto.getEgreso()
@@ -65,13 +74,13 @@ public class GestorReserva {
             }
         }
 
-        // 4. Gestionar TITULAR (Quien paga)
+        //Gestionar TITULAR (Quien paga)
         Huesped titular = obtenerOGuardarHuesped(dto.getHuesped());
 
-        // 5. Preparar mapa de ocupantes (si viene en el DTO)
+        //Preparar mapa de ocupantes (si viene en el DTO)
         Map<Integer, List<OcupanteDTO>> mapaOcupantes = dto.getOcupantesPorHabitacion();
 
-        // 6. CREAR RESERVAS
+        //CREAR RESERVAS
         List<Reserva> reservasGuardadas = new ArrayList<>();
 
         for (Habitacion h : habitaciones) {
@@ -82,7 +91,6 @@ public class GestorReserva {
             r.setEstado(estadoNuevo);
             r.setHabitacion(h);
 
-            // --- [IMPORTANTE] LÓGICA DE OCUPANTES AÑADIDA ---
             if (mapaOcupantes != null && mapaOcupantes.containsKey(h.getId())) {
                 List<OcupanteDTO> listaDTOs = mapaOcupantes.get(h.getId());
 
@@ -94,31 +102,24 @@ public class GestorReserva {
                         ocupante.setNombre(oDto.getNombre());
                         ocupante.setApellido(oDto.getApellido());
 
-                        // Asignamos el DNI (usando tu método setDni o setDocumento)
+                        // Asignamos el DNI (usando método setDni o setDocumento)
                         ocupante.setDni(oDto.getDni());
-
-                        // ✅ CORRECCIÓN CRÍTICA 1: Valores por defecto
                         ocupante.setTelefono("-");
                         ocupante.setTipoDocumento(TipoDocumento.DNI);
-
-                        // ✅ CORRECCIÓN CRÍTICA 2: Asignar la habitación explícitamente
-                        // Esta línea es la que hace que se guarde el ID en la base de datos
                         ocupante.setHabitacion(h);
-
-                        // Vinculamos con la reserva
                         r.agregarOcupante(ocupante);
                     }
                 }
             }
-            // --------------------------------------------------
-
             reservasGuardadas.add(reservaRepository.save(r));
         }
 
         return reservasGuardadas;
     }
 
-    // Auxiliar Huesped
+    /**
+     * Obtiene un huésped por documento o lo crea si no existe.
+     */
     private Huesped obtenerOGuardarHuesped(ReservaDTO.DatosHuespedReserva datos) {
         Huesped huesped = huespedRepository.findByDocumento(datos.getDocumento());
         if (huesped == null) {

@@ -6,6 +6,15 @@ import org.TPDesarrollo.enums.RazonSocial;
 import org.TPDesarrollo.enums.TipoDocumento;
 import java.time.LocalDate;
 
+/**
+ * DTO para representar la información de un huésped.
+ * Incluye validaciones para asegurar la integridad de los datos.
+ * Contiene atributos como nombre, apellido, teléfono, tipo y número de documento,
+ * fecha de nacimiento, nacionalidad, email, dirección, CUIT, ocupación y posición
+ * frente al IVA.
+ * Utiliza anotaciones de validación de Jakarta para garantizar que los datos
+ * cumplan con los requisitos especificados.
+ */
 public class HuespedDTO {
     private Integer id;
 
@@ -33,7 +42,6 @@ public class HuespedDTO {
     // $ = Termina la cadena
     @Pattern(regexp = "^[0-9]{7,8}$", message = "El DNI debe contener solo 7 u 8 números, sin letras ni puntos.")
     private String documento;
-    // ahora String
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Past(message = "La fecha de nacimiento debe ser anterior a hoy")
     private LocalDate fechaNacimiento;
@@ -66,19 +74,19 @@ public class HuespedDTO {
     @AssertTrue(message = "El CUIT es obligatorio si la posición frente al IVA no es 'Consumidor Final'.")
     private boolean isCuitConsistente() {
 
-        // Si posicionIVA es nula, no podemos validar.
+        // Si posicionIVA es nula
         // (Dejamos que el @NotBlank de posicionIVA maneje ese error)
         if (posicionIVA == null) {
             return true;
         }
 
-        // CASO 1: Si es Consumidor Final, la validación pasa.
+        //Si es Consumidor Final, la validación pasa.
         // No nos importa si el CUIT es nulo o no.
         if (posicionIVA.name().equalsIgnoreCase("Consumidor_Final") || posicionIVA.toString().equalsIgnoreCase("Consumidor Final")) {
             return true;
         }
 
-        // CASO 2: Si NO es Consumidor Final (es "Responsable Inscripto", etc.),
+        // Si NO es Consumidor Final (es "Responsable Inscripto", "Monotributista", etc.),
         // el CUIT DEBE estar presente (no ser nulo ni estar vacío).
         return cuit != null && !cuit.isBlank();
     }

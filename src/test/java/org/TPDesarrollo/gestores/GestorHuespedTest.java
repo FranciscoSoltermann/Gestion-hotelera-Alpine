@@ -27,7 +27,7 @@ class GestorHuespedTest {
     @InjectMocks
     private GestorHuesped gestorHuesped;
 
-    // --- TEST 1: ERROR DNI (El que ya tenías) ---
+
     @Test
     void darDeAlta_DeberiaLanzarExcepcion_SiDniExiste() {
         // Given
@@ -42,7 +42,7 @@ class GestorHuespedTest {
         verify(huespedRepository, never()).save(any());
     }
 
-    // --- TEST 2: ERROR CUIT (Este faltaba) ---
+
     @Test
     void darDeAlta_DeberiaLanzarExcepcion_SiCuitExiste() {
         // Given
@@ -59,7 +59,7 @@ class GestorHuespedTest {
         verify(huespedRepository, never()).save(any());
     }
 
-    // --- TEST 3: GUARDADO EXITOSO (Mejorado) ---
+
     @Test
     void darDeAlta_DeberiaGuardar_SiDatosSonValidos() {
         // Given
@@ -82,7 +82,7 @@ class GestorHuespedTest {
         verify(huespedRepository, times(1)).save(any(Huesped.class));
     }
 
-    // --- TEST 4: LOGICA AUTOMÁTICA (Consumidor Final) ---
+
     @Test
     void darDeAlta_DeberiaAsignarConsumidorFinal_SiNoHayCuit() {
         // Given
@@ -105,7 +105,7 @@ class GestorHuespedTest {
         ));
     }
 
-    // --- TEST 5: BÚSQUEDA (Este faltaba) ---
+
     @Test
     void buscarHuespedes_DeberiaLlamarAlRepositorio() {
         // Given

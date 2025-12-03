@@ -3,6 +3,14 @@ package org.TPDesarrollo.clases;
 import jakarta.persistence.*;
 import org.TPDesarrollo.enums.TipoDocumento;
 
+/**
+ * Clase abstracta Persona
+ * Representa una persona con atributos comunes como nombre, apellido, teléfono, documento y tipo de
+ * documento. Esta clase es la superclase de Huesped y Usuario.
+ * Utiliza el patrón Builder genérico para facilitar la creación de instancias de sus subclases.
+ * Hereda de la clase Direccion para incluir información de dirección.
+ * Está mapeada a una tabla en la base de datos utilizando JPA con estrategia de herencia JOINED.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Persona {
@@ -30,10 +38,10 @@ public abstract class Persona {
 
 
 
-    // 1. Constructor vacío (Obligatorio para JPA)
+    //Constructor vacío (Obligatorio para JPA)
     public Persona() {}
 
-    // 2. Constructor protegido para que los hijos (Huesped/Usuario) lo usen
+    //Constructor protegido para que los hijos
     protected Persona(PersonaBuilder<?, ?> builder) {
         this.nombre = builder.nombre;
         this.apellido = builder.apellido;
@@ -56,10 +64,7 @@ public abstract class Persona {
     public TipoDocumento getTipoDocumento() { return tipoDocumento; }
     public void setTipoDocumento(TipoDocumento tipoDocumento) { this.tipoDocumento = tipoDocumento; }
 
-    // --- PATRÓN BUILDER GENÉRICO ---
-
-    // T: El tipo de la clase concreta (ej. Huesped)
-    // B: El tipo del Builder concreto (ej. HuespedBuilder)
+    //PATRÓN BUILDER GENÉRICO
     public static abstract class PersonaBuilder<T extends Persona, B extends PersonaBuilder<T, B>> {
         protected String nombre;
         protected String apellido;
@@ -68,7 +73,7 @@ public abstract class Persona {
         protected TipoDocumento tipoDocumento;
         protected Direccion direccion;
 
-        // Método abstracto para que el hijo se devuelva a sí mismo ('this')
+        // Método abstracto para que el hijo se devuelva a sí mismo
         protected abstract B self();
 
         public abstract T build();

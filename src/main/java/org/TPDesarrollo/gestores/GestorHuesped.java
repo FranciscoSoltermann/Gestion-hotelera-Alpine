@@ -18,6 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * GestorHuesped es responsable de la lógica de negocio relacionada con los huéspedes.
+ * Proporciona métodos para buscar, crear, modificar y eliminar huéspedes.
+ * Utiliza HuespedRepository para interactuar con la base de datos.
+ * Incluye conversiones entre Huesped y HuespedDTO.
+ * Está anotado como un servicio de Spring y maneja transacciones.
+ */
 @Service
 public class GestorHuesped {
 
@@ -28,10 +35,9 @@ public class GestorHuesped {
         this.huespedRepository = huespedRepository;
     }
 
-    // --- NUEVO: BUSCAR POR DNI EXACTO (Para el formulario de Reserva) ---
+    // BUSCAR POR DNI EXACTO (Para el formulario de Reserva)
     @Transactional(readOnly = true)
     public HuespedDTO buscarPorDni(String dni) {
-        // Usamos el método que ya tienes en tu repositorio
         Huesped huesped = huespedRepository.findByDocumento(dni);
 
         if (huesped != null) {
@@ -39,11 +45,7 @@ public class GestorHuesped {
         }
         return null;
     }
-
-    // ==========================================================
-    // BUSCAR HUESPEDES (Búsqueda general por filtros)
-    // ==========================================================
-
+    // BÚSQUEDA GENERAL CON FILTROS
     @Transactional(readOnly = true)
     public List<HuespedDTO> buscarHuespedes(String apellido, String nombre, String tipoDocumento, String documento) {
 
@@ -67,21 +69,13 @@ public class GestorHuesped {
                 .map(this::convertirA_DTO)
                 .collect(Collectors.toList());
     }
-
-    // ==========================================================
-    // OBTENER UN HUESPED POR ID
-    // ==========================================================
-
+    // OBTENER HUESPED SELECCIONADO POR ID
     @Transactional(readOnly = true)
     public HuespedDTO obtenerHuespedSeleccionado(Integer idHuesped) {
         return huespedRepository.findById(idHuesped)
                 .map(this::convertirA_DTO)
                 .orElse(null);
     }
-
-    // ==========================================================
-    // DAR DE ALTA HUESPED
-    // ==========================================================
 
     @Transactional
     public Huesped darDeAltaHuesped(HuespedDTO dto) {
@@ -103,35 +97,21 @@ public class GestorHuesped {
         return huespedRepository.save(entidad);
     }
 
-    // ==========================================================
-    // MODIFICAR
-    // ==========================================================
-
     @Transactional
     public void modificarHuesped(HuespedDTO dto) {
         Huesped entidad = convertirA_Entidad(dto);
         huespedRepository.save(entidad);
     }
 
-    // ==========================================================
-    // BAJA
-    // ==========================================================
-
     @Transactional
     public void darDeBajaHuesped(Integer id) {
         huespedRepository.deleteById(id);
     }
-
-    // ==========================================================
-    // CONVERSIONES DTO ↔ ENTIDAD
-    // ==========================================================
-
+    // CONVERSIONES ENTRE DTO Y ENTIDAD
     private HuespedDTO convertirA_DTO(Huesped entidad) {
 
         HuespedDTO dto = new HuespedDTO();
         dto.setId(entidad.getId());
-
-        // --- CAMPOS DE PERSONA ---
         dto.setNombre(entidad.getNombre());
         dto.setApellido(entidad.getApellido());
         dto.setDocumento(entidad.getDocumento());
@@ -144,15 +124,13 @@ public class GestorHuesped {
         if (entidad.getDireccion() != null) {
             dto.setDireccion(new DireccionDTO(entidad.getDireccion()));
         }
-
-        // --- CAMPOS DE HUESPED ---
         dto.setCuit(entidad.getCuit());
         dto.setOcupacion(entidad.getOcupacion());
         dto.setPosicionIVA(entidad.getPosicionIVA());
 
         return dto;
     }
-
+    // CONVIERTE UN HuespedDTO A UNA ENTIDAD Huesped
     private Huesped convertirA_Entidad(HuespedDTO dto) {
 
         Direccion direccionEntidad = null;
@@ -172,7 +150,6 @@ public class GestorHuesped {
         }
 
         Huesped huesped = Huesped.builder()
-                // --- PERSONA ---
                 .nombre(dto.getNombre())
                 .apellido(dto.getApellido())
                 .documento(dto.getDocumento())
@@ -182,13 +159,11 @@ public class GestorHuesped {
                 .nacionalidad(dto.getNacionalidad())
                 .fechaNacimiento(dto.getFechaNacimiento())
                 .direccion(direccionEntidad)
-                // --- HUESPED ---
                 .cuit(dto.getCuit())
                 .ocupacion(dto.getOcupacion())
                 .posicionIVA(dto.getPosicionIVA())
                 .build();
 
-        // si es modificación
         if (dto.getId() != null) {
             huesped.setId(dto.getId());
         }

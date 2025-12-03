@@ -9,6 +9,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Configuración de seguridad para la aplicación.
+ * Define las reglas de acceso y los mecanismos de autenticación.
+ * Utiliza Spring Security para gestionar la seguridad de las rutas de la API.
+ * Permite el acceso libre a las rutas de usuario, huésped, reserva y habitación,
+ * mientras que protege cualquier otra ruta que requiera autenticación.
+ * También configura un codificador de contraseñas utilizando BCrypt.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -18,6 +26,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -2,6 +2,14 @@ package org.TPDesarrollo.clases;
 
 import jakarta.persistence.*;
 
+/**
+ * Clase Ocupante
+ * Representa a un ocupante asociado a una reserva y una habitación.
+ * Hereda de la clase Persona.
+ * Contiene una relación ManyToOne con Reserva y Habitacion.
+ * Proporciona métodos para obtener y establecer la reserva y la habitación asociadas.
+ * También incluye métodos puente para manejar el DNI.
+ */
 @Entity
 @Table(name = "ocupante", schema = "pruebabdd")
 @PrimaryKeyJoinColumn(name = "id_persona")
@@ -11,10 +19,11 @@ public class Ocupante extends Persona {
     @JoinColumn(name = "id_reserva")
     private Reserva reserva;
 
-    // ✅ NUEVO: Agregamos esto para conectar con la tabla Habitacion
+
     @ManyToOne
     @JoinColumn(name = "id_habitacion")
     private Habitacion habitacion;
+
 
     public Ocupante() {
         super();
@@ -28,17 +37,16 @@ public class Ocupante extends Persona {
         this.reserva = reserva;
     }
 
-    // --- GETTERS Y SETTERS ---
+    //Getters y setters
 
     public Reserva getReserva() { return reserva; }
     public void setReserva(Reserva reserva) { this.reserva = reserva; }
 
-    // ✅ NUEVO: Getters y Setters para Habitacion
+    //Getters y Setters para Habitacion
     public Habitacion getHabitacion() { return habitacion; }
     public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
 
-    // --- MÉTODOS PUENTE ---
-
+    //Metodos Puentes
     public String getDni() {
         return this.getDocumento();
     }

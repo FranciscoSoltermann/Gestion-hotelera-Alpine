@@ -2,6 +2,11 @@ package org.TPDesarrollo.clases;
 
 import jakarta.persistence.*;
 
+/**
+ * Clase que representa una dirección física.
+ * Implementa el patrón Builder para facilitar la creación de instancias.
+ * Utiliza anotaciones JPA para el mapeo a una tabla de base de datos.
+ */
 @Entity
 @Table(name = "direccion")
 public class Direccion {
@@ -23,10 +28,18 @@ public class Direccion {
     private String pais;
     private String provincia;
 
-    // 1. Constructor vacío requerido por JPA
+    /**
+     * --- PATRÓN BUILDER IMPLEMENTADO ---
+     * Constructor vacío requerido por JPA
+     * Constructor privado que recibe el Builder
+     * Método estático para iniciar el Builder
+     * Clase interna estática Builder con métodos fluidos
+     * Método build() para construir la instancia final
+     */
+    // Constructor vacío requerido por JPA
     public Direccion() {}
 
-    // 2. Constructor privado para que solo el Builder pueda usarlo
+    // Constructor privado para que solo el Builder pueda usarlo
     private Direccion(DireccionBuilder builder) {
         this.pais = builder.pais;
         this.provincia = builder.provincia;
@@ -38,12 +51,12 @@ public class Direccion {
         this.codigoPostal = builder.codigoPostal;
     }
 
-    // 3. Método estático para iniciar el Builder
+    // Método estático para iniciar el Builder
     public static DireccionBuilder builder() {
         return new DireccionBuilder();
     }
 
-    // Getters y Setters (necesarios para JPA y tu lógica)
+    // Getters y Setters (necesarios para JPA)
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getLocalidad() { return localidad; }
@@ -63,7 +76,7 @@ public class Direccion {
     public String getProvincia() { return provincia; }
     public void setProvincia(String provincia) { this.provincia = provincia; }
 
-    // --- CLASE INTERNA ESTATICA BUILDER ---
+    //CLASE INTERNA ESTATICA BUILDER
     public static class DireccionBuilder {
         private String pais;
         private String provincia;
@@ -73,6 +86,7 @@ public class Direccion {
         private String departamento;
         private String piso;
         private String codigoPostal;
+
 
         // Constructor del builder
         public DireccionBuilder() {}

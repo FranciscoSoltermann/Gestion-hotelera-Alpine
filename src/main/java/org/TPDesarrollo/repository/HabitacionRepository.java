@@ -10,6 +10,14 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Repositorio para la entidad Habitacion.
+ * Proporciona métodos para realizar operaciones CRUD y consultas personalizadas.
+ * Utiliza Spring Data JPA para la implementación automática de métodos.
+ * Permite buscar habitaciones por estado, número, capacidad y disponibilidad en rangos de fechas.
+ * También permite obtener habitaciones bloqueadas por mantenimiento y contar habitaciones por estado.
+ * Además, soporta consultas por tipo de habitación utilizando herencia.
+ */
 @Repository
 public interface HabitacionRepository extends JpaRepository<Habitacion, Integer> {
 
@@ -34,18 +42,24 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Integer>
             AND r.estado <> 'CANCELADA' 
         )
     """)
+
+    /**
+     * Busca habitaciones disponibles en un rango de fechas específico.
+     */
     List<Habitacion> buscarDisponiblesEnRango(
             @Param("fechaIngreso") LocalDate fechaIngreso,
             @Param("fechaEgreso") LocalDate fechaEgreso
     );
 
-
+    /**
+     * Busca habitaciones por su tipo utilizando herencia.
+     */
     @Query("SELECT h FROM Habitacion h WHERE TYPE(h) = :clazz")
     <T extends Habitacion> List<T> findByTipo(Class<T> clazz);
 
 
 
-    // Esto sirve para ver bloqueos administrativos (ej. Mantenimiento)
+    // Esto sirve para ver bloqueos administrativos (Mantenimientos)
     @Query("""
        SELECT h FROM Habitacion h
        WHERE h.ingreso IS NOT NULL 
@@ -54,6 +68,5 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Integer>
        """)
     List<Habitacion> obtenerBloqueadasPorMantenimientoEnFecha(@Param("fecha") LocalDate fecha);
 
-    // Contadores útiles
     long countByEstado(EstadoHabitacion estado);
 }

@@ -32,9 +32,7 @@ class GestorHabitacionTest {
     @InjectMocks
     private GestorHabitacion gestorHabitacion;
 
-    // ==========================================================
-    // TEST 1: VALIDACIONES DE FECHAS
-    // ==========================================================
+
     @Test
     void obtenerEstado_DeberiaLanzarExcepcion_SiFechasSonNulas() {
         assertThrows(IllegalArgumentException.class, () ->
@@ -52,9 +50,6 @@ class GestorHabitacionTest {
         );
     }
 
-    // ==========================================================
-    // TEST 2: SIN RESERVAS (Todo Disponible)
-    // ==========================================================
     @Test
     void obtenerEstado_SinReservas_DeberiaDevolverTodoDisponible() {
         // GIVEN
@@ -87,9 +82,7 @@ class GestorHabitacionTest {
                 .allMatch(dia -> dia.getEstado() == EstadoHabitacion.DISPONIBLE));
     }
 
-    // ==========================================================
-    // TEST 3: CON RESERVA (Ocupada en el medio)
-    // ==========================================================
+
     @Test
     void obtenerEstado_ConReserva_DeberiaMarcarDiasOcupados() {
         // GIVEN
@@ -104,7 +97,7 @@ class GestorHabitacionTest {
         // 2. La habitación "Interna" de la reserva
         // TRUCO: Debe tener el MISMO ID (1) y estado OCUPADA
         Habitacion habEnReserva = new Habitacion() {};
-        habEnReserva.setId(1); // <--- ⭐ ESTO FALTABA: EL ID TIENE QUE COINCIDIR ⭐
+        habEnReserva.setId(1);
         habEnReserva.setEstado(EstadoHabitacion.OCUPADA);
 
         // Reserva para el día 2
@@ -134,9 +127,7 @@ class GestorHabitacionTest {
         assertEquals(EstadoHabitacion.DISPONIBLE, estados.get(2).getEstado());
     }
 
-    // ==========================================================
-    // TEST 4: MANTENIMIENTO (Sin reservas)
-    // ==========================================================
+
     @Test
     void obtenerEstado_Mantenimiento_DeberiaMarcarMantenimientoEnFechas() {
         // GIVEN

@@ -5,6 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Configuración de CORS para la aplicación.
+ * Permite solicitudes desde el front-end alojado en http://localhost:3000.
+ * Configura los métodos HTTP permitidos y las cabeceras.
+ * Esto es esencial para permitir la comunicación entre el front-end y el back-end.
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 

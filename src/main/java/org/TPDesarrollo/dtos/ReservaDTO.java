@@ -8,6 +8,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DTO para manejar reservas de habitaciones.
+ * Incluye datos del huésped titular, fechas y habitaciones.
+ * Además, permite especificar ocupantes por habitación.
+ * Se utiliza para transferir datos entre capas de la aplicación.
+ * Contiene validaciones para asegurar la integridad de los datos.
+ */
 public class ReservaDTO {
 
     private Integer id;
@@ -20,13 +27,13 @@ public class ReservaDTO {
 
     @NotNull(message = "Los datos del titular son obligatorios")
     @Valid
-    private DatosHuespedReserva huesped; // El titular (quien paga)
+    private DatosHuespedReserva huesped;
 
     @NotEmpty(message = "Debe seleccionar al menos una habitación")
-    private List<Integer> habitaciones; // IDs simples para validación rápida
+    private List<Integer> habitaciones;
 
-    // --- NUEVO: Ocupantes por habitación ---
-    // Key: ID Habitación, Value: Lista de personas
+
+
     private Map<Integer, List<OcupanteDTO>> ocupantesPorHabitacion;
 
     public ReservaDTO() {}
@@ -38,7 +45,7 @@ public class ReservaDTO {
         @NotBlank(message = "Apellido obligatorio") public String apellido;
         public String telefono;
 
-        // Getters/Setters (puedes generarlos o usar Lombok si tienes)
+        // Getters/Setters
         public String getTipoDocumento() { return tipoDocumento; }
         public void setTipoDocumento(String t) { this.tipoDocumento = t; }
         public String getDocumento() { return documento; }
@@ -51,7 +58,7 @@ public class ReservaDTO {
         public void setTelefono(String t) { this.telefono = t; }
     }
 
-    // Getters y Setters Principales
+    // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public LocalDate getIngreso() { return ingreso; }

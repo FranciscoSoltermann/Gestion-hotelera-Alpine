@@ -4,6 +4,12 @@ import jakarta.persistence.*;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
 
+/**
+ * Clase Habitacion
+ * Representa una habitación en el sistema de gestión hotelera.
+ * Utiliza herencia JOINED para permitir subclases de habitaciones.
+ * Contiene atributos básicos como número, estado, fechas de ingreso y egreso.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "habitacion", schema = "pruebabdd")
@@ -39,12 +45,8 @@ public class Habitacion {
     public void setId(Integer id) { this.id = id; }
     public String getNumero() { return numero; }
     public void setNumero(String numero) { this.numero = numero; }
-
-    // --- AGREGAR GETTER Y SETTER DE CAPACIDAD ---
     public Integer getCapacidad() { return capacidad; }
     public void setCapacidad(Integer capacidad) { this.capacidad = capacidad; }
-    // --------------------------------------------
-
     public EstadoHabitacion getEstado() { return estado; }
     public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
     public LocalDate getIngreso() { return ingreso; }

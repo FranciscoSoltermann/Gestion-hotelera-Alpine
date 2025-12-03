@@ -11,6 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador REST para la gestión de usuarios.
+ * Proporciona endpoints para el login y registro de usuarios.
+ * Utiliza GestorUsuario para la lógica de negocio.
+ * Maneja excepciones específicas para proporcionar respuestas adecuadas.
+ */
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioControlador {
@@ -23,15 +29,13 @@ public class UsuarioControlador {
     }
 
     @PostMapping("/login")
-    // Quitamos el 'throws' porque las excepciones son RuntimeException (no chequeadas)
     public ResponseEntity<?> login(@RequestBody UsuarioDTO datos) throws UsuarioNoEncontrado, ContraseniaInvalida {
 
-        // 1. CORRECCIÓN: Recibimos el objeto Usuario del gestor
-        // (Asegúrate de haber actualizado GestorUsuario para que devuelva 'Usuario' y no 'void')
+        // Recibimos el objeto Usuario del gestor
         Usuario usuarioLogueado = gestorUsuario.autenticarUsuario(datos.getNombre(), datos.getContrasenia());
 
-        // 2. CORRECCIÓN: Devolvemos el objeto, NO un String.
-        // Spring lo convertirá automáticamente a JSON: {"id":1, "nombre":"fran", ...}
+        //Devolvemos el objeto, NO un String.
+        //Spring lo convertirá automáticamente a JSON
         return ResponseEntity.ok(usuarioLogueado);
     }
 

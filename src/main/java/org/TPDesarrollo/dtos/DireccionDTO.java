@@ -5,6 +5,12 @@ import org.TPDesarrollo.clases.Direccion;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * DTO para representar una dirección.
+ * Contiene validaciones para asegurar que los campos obligatorios
+ * estén presentes y en el formato correcto.
+ * Se utiliza para transferir datos de dirección entre capas de la aplicación.
+ */
 public class DireccionDTO {
 
     @NotBlank(message = "El país es obligatorio")
@@ -28,7 +34,7 @@ public class DireccionDTO {
 
     private String piso;
 
-    // --- VALIDACIÓN PARA CÓDIGO POSTAL ---
+    //VALIDACIÓN PARA CÓDIGO POSTAL
     @NotBlank(message = "El código postal es obligatorio")
     private String codigoPostal;
 

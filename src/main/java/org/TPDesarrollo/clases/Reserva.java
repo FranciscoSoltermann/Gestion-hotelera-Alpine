@@ -6,6 +6,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase que representa una reserva en el sistema de gestión hotelera.
+ * Esta clase está mapeada a la tabla "reserva" en el esquema "pruebabdd" de la base de datos.
+ * Contiene información sobre las fechas de ingreso y egreso,
+ * el ID de la persona que realiza la reserva, el estado de la reserva,
+ * la habitación asociada y la lista de ocupantes de la reserva.
+ * Además, incluye métodos para gestionar la relación con los ocupantes.
+ */
 @Entity
 @Table(name = "reserva", schema = "pruebabdd")
 public class Reserva {
@@ -32,21 +40,20 @@ public class Reserva {
     @JoinColumn(name = "id_habitacion")
     private Habitacion habitacion;
 
-    // --- NUEVO: LISTA DE OCUPANTES ---
+
     // mappedBy = "reserva" se refiere al atributo 'reserva' en la clase Ocupante
     // CascadeType.ALL: Si guardas la reserva, se guardan los ocupantes.
     // orphanRemoval = true: Si borras un ocupante de la lista, se borra de la BD.
     @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ocupante> ocupantes = new ArrayList<>();
 
-    // Asegúrate de tener este método helper
     public void agregarOcupante(Ocupante ocupante) {
         ocupantes.add(ocupante);
         ocupante.setReserva(this);
     }
     public Reserva() {}
 
-    // --- GETTERS Y SETTERS ---
+    //GETTERS Y SETTERS
 
     public Integer getId() { return id_reserva; }
     public void setId(Integer id) { this.id_reserva = id; }
@@ -66,7 +73,7 @@ public class Reserva {
     public Habitacion getHabitacion() { return habitacion; }
     public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
 
-    // --- GETTERS Y SETTERS PARA OCUPANTES ---
+    //GETTERS Y SETTERS
 
     public List<Ocupante> getOcupantes() {
         return ocupantes;
@@ -75,7 +82,6 @@ public class Reserva {
     public void setOcupantes(List<Ocupante> ocupantes) {
         this.ocupantes = ocupantes;
     }
-
 
     public LocalDate getFechaIngreso() { return ingreso; }
     public LocalDate getFechaEgreso() { return egreso; }

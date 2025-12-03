@@ -8,6 +8,13 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador REST para gestionar reservas y ocupaciones de habitaciones.
+ * Proporciona endpoints para crear reservas y ocupar habitaciones.
+ * Maneja respuestas exitosas y errores en formato JSON.
+ * Utiliza la clase GestorReserva para la lógica de negocio.
+ * Los endpoints son accesibles sin autenticación.
+ */
 @RestController
 @RequestMapping("/api/reservas")
 public class ReservaControlador {
@@ -18,7 +25,9 @@ public class ReservaControlador {
         this.gestorReserva = gestorReserva;
     }
 
+
     @PostMapping
+    // Endpoint para crear una nueva reserva
     public ResponseEntity<?> crearReserva(@Valid @RequestBody ReservaDTO dto) {
         try {
             gestorReserva.crearReserva(dto);
@@ -27,7 +36,6 @@ public class ReservaControlador {
             return ResponseEntity.ok(respuesta);
         } catch (Exception e) {
             e.printStackTrace();
-            // --- CORRECCIÓN: Devolvemos JSON también en el error ---
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("mensaje", e.getMessage()); // Pasamos el mensaje real al front
             return ResponseEntity.internalServerError().body(errorResponse);
@@ -35,6 +43,7 @@ public class ReservaControlador {
     }
 
     @PostMapping("/ocupar")
+    // Endpoint para ocupar una habitación (check-in)
     public ResponseEntity<?> ocuparHabitacion(@Valid @RequestBody ReservaDTO dto) {
         try {
             gestorReserva.crearOcupacion(dto);
@@ -43,7 +52,6 @@ public class ReservaControlador {
             return ResponseEntity.ok(respuesta);
         } catch (Exception e) {
             e.printStackTrace();
-            // --- CORRECCIÓN: Devolvemos JSON también en el error ---
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("mensaje", e.getMessage());
             return ResponseEntity.internalServerError().body(errorResponse);

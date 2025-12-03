@@ -13,7 +13,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-// 👇 ESTA LÍNEA ES LA CLAVE: Le dice que use tu PostgreSQL real
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class HuespedRepositoryTest {
 
@@ -22,7 +21,7 @@ class HuespedRepositoryTest {
 
     @Test
     void buscarHuespedesPorCriterios_DeberiaEncontrarPorApellido() {
-        // 1. GIVEN: Preparamos datos de prueba
+
         // Creamos un huésped con TODOS los datos obligatorios para que Postgres no se queje
         Huesped h1 = new Huesped();
         h1.setNombre("Juan");
@@ -47,13 +46,12 @@ class HuespedRepositoryTest {
         huespedRepository.save(h1);
         huespedRepository.save(h2);
 
-        // 2. WHEN: Ejecutamos tu búsqueda personalizada
+
         // Buscamos solo por apellido "PerezTest"
         List<Huesped> resultados = huespedRepository.buscarHuespedesPorCriterios(
                 "PerezTest", null, null, null
         );
 
-        // 3. THEN: Verificamos
         assertThat(resultados).isNotEmpty();
         // Debería traer al menos a Juan (o más si ya tenías otros PerezTest en tu BD)
         assertThat(resultados.get(0).getApellido()).isEqualTo("PerezTest");

@@ -3,6 +3,12 @@ package org.TPDesarrollo.dtos;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
 
+/**
+ * DTO para representar el estado de una habitación en un día específico.
+ * Contiene la fecha y el estado de la habitación.
+ * Utilizado para transferir datos entre capas de la aplicación.
+ */
+
 public class EstadoDiaDTO {
     private LocalDate fecha;
     private EstadoHabitacion estado;

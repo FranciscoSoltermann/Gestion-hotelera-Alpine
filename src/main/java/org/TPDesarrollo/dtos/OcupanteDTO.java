@@ -1,5 +1,9 @@
 package org.TPDesarrollo.dtos;
 
+/**
+ * DTO para representar un ocupante con su nombre, apellido y DNI.
+ * Proporciona métodos para obtener y establecer estos atributos.
+ */
 public class OcupanteDTO {
     private String nombre;
     private String apellido;

@@ -32,14 +32,12 @@ class UsuarioControladorTest {
 
     @Test
     void login_DeberiaDevolver200_Y_Usuario() throws Exception {
-        // Given
         UsuarioDTO loginDto = new UsuarioDTO("fran", "12345AAA"); // Pass cumple reglas
         Usuario usuarioRetornado = new Usuario();
         usuarioRetornado.setNombre("fran");
 
         when(gestorUsuario.autenticarUsuario(anyString(), anyString())).thenReturn(usuarioRetornado);
 
-        // When & Then
         mockMvc.perform(post("/api/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto)))

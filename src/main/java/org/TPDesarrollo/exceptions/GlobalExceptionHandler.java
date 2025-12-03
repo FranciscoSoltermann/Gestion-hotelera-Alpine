@@ -11,6 +11,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Manejador global de excepciones para la aplicación.
+ * Captura diversas excepciones y devuelve respuestas HTTP adecuadas en formato JSON.
+ * Incluye manejo para validaciones, duplicados y errores generales.
+ * Asegura que el front-end reciba mensajes claros y consistentes.
+ * @RestControllerAdvice indica que esta clase maneja excepciones para todos los controladores REST.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
