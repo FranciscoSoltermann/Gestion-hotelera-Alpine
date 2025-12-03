@@ -1,0 +1,11 @@
+org.TPDesarrollo
+org.TPDesarrollo.clases
+org.TPDesarrollo.clases.habitaciones
+org.TPDesarrollo.configuracion
+org.TPDesarrollo.controlador
+org.TPDesarrollo.dtos
+org.TPDesarrollo.enums
+org.TPDesarrollo.exceptions
+org.TPDesarrollo.gestores
+org.TPDesarrollo.repository
+org.TPDesarrollo.validaciones
