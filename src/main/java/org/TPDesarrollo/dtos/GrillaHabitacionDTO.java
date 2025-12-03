@@ -11,7 +11,7 @@ public class GrillaHabitacionDTO {
     private Integer idHabitacion;
     private String numero;
     private String tipo;
-    private Integer capacidad; // <--- AGREGAR ESTO
+    private Integer capacidad;
     private List<EstadoDiaDTO> estadosPorDia;
 
     public GrillaHabitacionDTO() {}

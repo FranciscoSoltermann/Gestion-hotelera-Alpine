@@ -15,111 +15,133 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-/**
- * GestorReserva
- * Clase de servicio que maneja la lógica de negocio relacionada con reservas y ocupaciones de habitaciones.
- * Proporciona métodos para crear reservas y ocupaciones, validando disponibilidad y gestionando datos
- * de huéspedes y ocupantes.
- * Utiliza repositorios para interactuar con la base de datos.
- * Contiene lógica para validar fechas, verificar disponibilidad de habitaciones,
- * y gestionar la creación de reservas y ocupantes asociados.
- */
 @Service
 public class GestorReserva {
 
     private final HabitacionRepository habitacionRepository;
     private final ReservaRepository reservaRepository;
     private final HuespedRepository huespedRepository;
-    // Constructor con inyección de dependencias
+
     public GestorReserva(HabitacionRepository hr, ReservaRepository rr, HuespedRepository phr) {
         this.habitacionRepository = hr;
         this.reservaRepository = rr;
         this.huespedRepository = phr;
     }
 
-    //RESERVAR
+    // 1. RESERVAR
     @Transactional
     public List<Reserva> crearReserva(ReservaDTO dto) {
         return procesarReserva(dto, "RESERVADA");
     }
 
-    //OCUPAR (CHECK-IN)
+    // 2. OCUPAR (CHECK-IN)
     @Transactional
     public List<Reserva> crearOcupacion(ReservaDTO dto) {
         return procesarReserva(dto, "OCUPADA");
     }
 
-    // Lógica común para reservar u ocupar
+    // --- LÓGICA CENTRAL ---
     private List<Reserva> procesarReserva(ReservaDTO dto, String estadoNuevo) {
 
-        //Validar fechas
+        // 1. Validaciones básicas
         if (dto.getIngreso().isAfter(dto.getEgreso())) {
             throw new IllegalArgumentException("La fecha de ingreso debe ser anterior al egreso");
         }
 
-        //Obtener Habitaciones solicitadas
         List<Habitacion> habitaciones = habitacionRepository.findAllById(dto.getHabitaciones());
         if (habitaciones.size() != dto.getHabitaciones().size()) {
             throw new RuntimeException("Alguna habitación solicitada no existe");
         }
 
-        //VALIDAR DISPONIBILIDAD
+        // 2. Obtener/Guardar TITULAR (Necesitamos su ID para comparar)
+        Huesped titular = obtenerOGuardarHuesped(dto.getHuesped());
+
+        // 3. Mapa de ocupantes
+        Map<Integer, List<OcupanteDTO>> mapaOcupantes = dto.getOcupantesPorHabitacion();
+        List<Reserva> reservasGuardadas = new ArrayList<>();
+
+        // 4. PROCESAR CADA HABITACIÓN
         for (Habitacion h : habitaciones) {
+
+            // Buscamos conflictos de fecha en la BD
             List<Reserva> conflictos = reservaRepository.encontrarSolapamientos(
                     h.getId(), dto.getIngreso(), dto.getEgreso()
             );
+
+            Reserva reservaAProcesar = null;
+
+            // --- LÓGICA DE DETECCIÓN DE CHECK-IN ---
             if (!conflictos.isEmpty()) {
-                throw new RuntimeException("La habitación " + h.getNumero() + " ya está ocupada en esas fechas.");
+                // Hay solapamiento. Verificamos si es el MISMO dueño haciendo Check-in.
+
+
+                if ("OCUPADA".equals(estadoNuevo)) {
+
+
+                    Optional<Reserva> miReservaPrevia = conflictos.stream()
+                            .filter(r -> r.getIdPersona().equals(titular.getId()))
+                            .filter(r -> "RESERVADA".equals(r.getEstado()))
+                            .findFirst();
+
+                    if (miReservaPrevia.isPresent()) {
+                        // ¡ENCONTRADO! Es un Check-in válido.
+                        // Reutilizamos la reserva existente en lugar de crear una nueva.
+                        reservaAProcesar = miReservaPrevia.get();
+
+                        // Actualizamos el estado a OCUPADA
+                        reservaAProcesar.setEstado("OCUPADA");
+
+                        // Opcional: Actualizar fechas si el Check-in es en fecha distinta a la reserva original
+
+
+                    } else {
+                        // El conflicto es con OTRA persona o ya está OCUPADA.
+                        throw new RuntimeException("La habitación " + h.getNumero() + " ya está ocupada por otro huésped.");
+                    }
+                } else {
+                    // Si estoy intentando RESERVAR y ya hay algo, es error directo.
+                    throw new RuntimeException("La habitación " + h.getNumero() + " ya está reservada en esas fechas.");
+                }
             }
-        }
 
-        //Gestionar TITULAR (Quien paga)
-        Huesped titular = obtenerOGuardarHuesped(dto.getHuesped());
+            // Si no había conflicto, o no era una reserva mía -> Creamos NUEVA (Walk-in)
+            if (reservaAProcesar == null) {
+                reservaAProcesar = new Reserva();
+                reservaAProcesar.setIngreso(dto.getIngreso());
+                reservaAProcesar.setEgreso(dto.getEgreso());
+                reservaAProcesar.setIdPersona(titular.getId());
+                reservaAProcesar.setEstado(estadoNuevo);
+                reservaAProcesar.setHabitacion(h);
+            }
 
-        //Preparar mapa de ocupantes (si viene en el DTO)
-        Map<Integer, List<OcupanteDTO>> mapaOcupantes = dto.getOcupantesPorHabitacion();
-
-        //CREAR RESERVAS
-        List<Reserva> reservasGuardadas = new ArrayList<>();
-
-        for (Habitacion h : habitaciones) {
-            Reserva r = new Reserva();
-            r.setIngreso(dto.getIngreso());
-            r.setEgreso(dto.getEgreso());
-            r.setIdPersona(titular.getId()); // El titular va en la columna id_persona
-            r.setEstado(estadoNuevo);
-            r.setHabitacion(h);
-
+            // --- CARGA DE ACOMPAÑANTES ---
+            // (Esta lógica sirve tanto para Nueva Reserva como para Actualizar Reserva existente)
             if (mapaOcupantes != null && mapaOcupantes.containsKey(h.getId())) {
                 List<OcupanteDTO> listaDTOs = mapaOcupantes.get(h.getId());
 
                 for (OcupanteDTO oDto : listaDTOs) {
-                    // Solo procesamos si tiene nombre
                     if (oDto.getNombre() != null && !oDto.getNombre().isBlank()) {
-
                         Ocupante ocupante = new Ocupante();
                         ocupante.setNombre(oDto.getNombre());
                         ocupante.setApellido(oDto.getApellido());
-
-                        // Asignamos el DNI (usando método setDni o setDocumento)
                         ocupante.setDni(oDto.getDni());
-                        ocupante.setTelefono("-");
-                        ocupante.setTipoDocumento(TipoDocumento.DNI);
-                        ocupante.setHabitacion(h);
-                        r.agregarOcupante(ocupante);
+
+                        // Esto guarda la relación en la tabla 'ocupante'
+                        reservaAProcesar.agregarOcupante(ocupante);
                     }
                 }
             }
-            reservasGuardadas.add(reservaRepository.save(r));
+
+            // Guardamos (Si era existente hace UPDATE, si es nueva hace INSERT)
+            reservasGuardadas.add(reservaRepository.save(reservaAProcesar));
         }
 
         return reservasGuardadas;
     }
 
-    /**
-     * Obtiene un huésped por documento o lo crea si no existe.
-     */
+    // Auxiliar Huesped
     private Huesped obtenerOGuardarHuesped(ReservaDTO.DatosHuespedReserva datos) {
         Huesped huesped = huespedRepository.findByDocumento(datos.getDocumento());
         if (huesped == null) {
@@ -142,7 +164,8 @@ public class GestorReserva {
             huesped.setDireccion(d);
             return huespedRepository.save(huesped);
         } else {
-            if (datos.getTelefono() != null) {
+            // Actualizar teléfono si viene nuevo
+            if (datos.getTelefono() != null && !datos.getTelefono().isEmpty()) {
                 huesped.setTelefono(datos.getTelefono());
                 return huespedRepository.save(huesped);
             }
