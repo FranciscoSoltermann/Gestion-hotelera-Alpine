@@ -2,7 +2,7 @@ package org.TPDesarrollo.controlador;
 
 import org.TPDesarrollo.clases.Huesped;
 import org.TPDesarrollo.dtos.HuespedDTO;
-import org.TPDesarrollo.gestores.GestorHuesped;
+import org.TPDesarrollo.service.GestorHuesped;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

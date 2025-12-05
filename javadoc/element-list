@@ -6,6 +6,6 @@ org.TPDesarrollo.controlador
 org.TPDesarrollo.dtos
 org.TPDesarrollo.enums
 org.TPDesarrollo.exceptions
-org.TPDesarrollo.gestores
+org.TPDesarrollo.service
 org.TPDesarrollo.repository
 org.TPDesarrollo.validaciones

@@ -1,7 +1,7 @@
 package org.TPDesarrollo.controlador;
 
 import org.TPDesarrollo.dtos.ReservaDTO;
-import org.TPDesarrollo.gestores.GestorReserva;
+import org.TPDesarrollo.service.GestorReserva;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
