@@ -26,7 +26,9 @@ public class GestorHabitacionImp implements GestorHabitacion {
     private final HabitacionMapper habitacionMapper;
 
     @Autowired
-    public GestorHabitacionImp(HabitacionRepository habitacionRepository, ReservaRepository reservaRepository, HabitacionMapper habitacionMapper) {
+    public GestorHabitacionImp(HabitacionRepository habitacionRepository,
+                               ReservaRepository reservaRepository,
+                               HabitacionMapper habitacionMapper) {
         this.habitacionRepository = habitacionRepository;
         this.reservaRepository = reservaRepository;
         this.habitacionMapper = habitacionMapper;
@@ -46,12 +48,10 @@ public class GestorHabitacionImp implements GestorHabitacion {
         List<Reserva> reservasSolapadas = reservaRepository.encontrarReservasEnRango(fechaDesde, fechaHasta);
 
         Map<Integer, List<Reserva>> reservasPorHab = new HashMap<>();
-
         for (Reserva r : reservasSolapadas) {
-            Habitacion h = r.getHabitacion();
-            if (h != null) {
+            if (r.getHabitacion() != null) {
                 reservasPorHab
-                        .computeIfAbsent(h.getId(), k -> new ArrayList<>())
+                        .computeIfAbsent(r.getHabitacion().getId(), k -> new ArrayList<>())
                         .add(r);
             }
         }
@@ -59,37 +59,32 @@ public class GestorHabitacionImp implements GestorHabitacion {
         List<GrillaHabitacionDTO> resultado = new ArrayList<>();
 
         for (Habitacion hab : todas) {
-
-            // Usamos el Mapper para iniciar la estructura
             GrillaHabitacionDTO fila = habitacionMapper.toGrillaDto(hab);
-
             List<EstadoDiaDTO> estados = new ArrayList<>();
             LocalDate dia = fechaDesde;
 
             while (!dia.isAfter(fechaHasta)) {
-
                 EstadoHabitacion estadoDelDia = EstadoHabitacion.DISPONIBLE;
-                List<Reserva> reservas = reservasPorHab.get(hab.getId());
 
+                List<Reserva> reservas = reservasPorHab.get(hab.getId());
+                boolean tieneReserva = false;
                 if (reservas != null) {
                     for (Reserva r : reservas) {
-                        boolean dentro = !dia.isBefore(r.getFechaIngreso()) && dia.isBefore(r.getFechaEgreso());
-                        if (dentro) {
-                            estadoDelDia = r.getEstadoHabitacion();
+                        if (!dia.isBefore(r.getIngreso()) && dia.isBefore(r.getEgreso())) {
+                            tieneReserva = true;
                             break;
                         }
                     }
                 }
 
-                if (estadoDelDia == EstadoHabitacion.DISPONIBLE) {
-                    if (hab.getEstado() != EstadoHabitacion.DISPONIBLE) {
-                        if (hab.getIngreso() != null && hab.getEgreso() != null) {
-                            if (!dia.isBefore(hab.getIngreso()) && dia.isBefore(hab.getEgreso())) {
-                                estadoDelDia = hab.getEstado();
-                            }
-                        } else {
-                            estadoDelDia = hab.getEstado();
-                        }
+                if (tieneReserva) {
+                    estadoDelDia = EstadoHabitacion.RESERVADA;
+                }
+
+                if (hab.getEstado() != EstadoHabitacion.DISPONIBLE) {
+                    if (dia.equals(LocalDate.now())) {
+                        estadoDelDia = hab.getEstado();
+                    } else if (tieneReserva && hab.getEstado() == EstadoHabitacion.OCUPADA) {
                     }
                 }
 
