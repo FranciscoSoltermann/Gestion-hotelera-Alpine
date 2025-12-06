@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Table(name = "estadia", schema = "pruebabdd")
 @Data
@@ -24,4 +27,21 @@ public class Estadia {
 
     @Column(name = "fecha_egreso")
     private String fechaEgreso;
+
+    @Column(nullable = false)
+    private LocalDateTime fechaHoraIngreso;
+
+    private LocalDateTime fechaHoraEgreso;
+
+    @ManyToOne
+    @JoinColumn(name = "habitacion_id", nullable = false)
+    private Habitacion habitacion;
+
+    @ManyToMany
+    @JoinTable(
+            name = "estadias_items_consumo",
+            joinColumns = @JoinColumn(name = "estadia_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_consumo_id")
+    )
+    private List<Consumo> itemsConsumo;
 }

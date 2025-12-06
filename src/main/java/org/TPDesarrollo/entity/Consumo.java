@@ -22,6 +22,6 @@ public class Consumo {
     @Column(name = "descripcion")
     private String descripcion;
 
-    @Column(name = "monto")
-    private int monto;
+    @Column(name = "precio")
+    private Float precio;
 }
