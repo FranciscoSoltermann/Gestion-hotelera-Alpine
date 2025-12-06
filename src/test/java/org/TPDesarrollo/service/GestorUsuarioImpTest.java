@@ -3,7 +3,7 @@ package org.TPDesarrollo.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.TPDesarrollo.clases.Usuario;
+import org.TPDesarrollo.entity.Usuario;
 import org.TPDesarrollo.dtos.UsuarioDTO;
 import org.TPDesarrollo.exceptions.ContraseniaInvalida;
 import org.TPDesarrollo.exceptions.UsuarioExistente;

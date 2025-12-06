@@ -1,6 +1,6 @@
 package org.TPDesarrollo.repository;
 
-import org.TPDesarrollo.clases.Reserva;
+import org.TPDesarrollo.entity.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

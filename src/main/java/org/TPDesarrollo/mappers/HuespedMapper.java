@@ -1,6 +1,6 @@
 package org.TPDesarrollo.mappers;
 
-import org.TPDesarrollo.clases.Huesped;
+import org.TPDesarrollo.entity.Huesped;
 import org.TPDesarrollo.dtos.HuespedDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

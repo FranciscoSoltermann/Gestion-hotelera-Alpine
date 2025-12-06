@@ -1,6 +1,6 @@
 package org.TPDesarrollo.mappers;
 
-import org.TPDesarrollo.clases.Usuario;
+import org.TPDesarrollo.entity.Usuario;
 import org.TPDesarrollo.dtos.UsuarioDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

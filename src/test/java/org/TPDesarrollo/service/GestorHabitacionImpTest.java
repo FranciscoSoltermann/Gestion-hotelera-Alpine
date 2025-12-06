@@ -3,8 +3,8 @@ package org.TPDesarrollo.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.TPDesarrollo.clases.Habitacion;
-import org.TPDesarrollo.clases.Reserva;
+import org.TPDesarrollo.entity.Habitacion;
+import org.TPDesarrollo.entity.Reserva;
 import org.TPDesarrollo.dtos.GrillaHabitacionDTO;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import org.TPDesarrollo.mappers.HabitacionMapper;

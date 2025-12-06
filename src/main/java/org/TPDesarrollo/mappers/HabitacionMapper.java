@@ -1,6 +1,6 @@
 package org.TPDesarrollo.mappers;
 
-import org.TPDesarrollo.clases.Habitacion;
+import org.TPDesarrollo.entity.Habitacion;
 import org.TPDesarrollo.dtos.GrillaHabitacionDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

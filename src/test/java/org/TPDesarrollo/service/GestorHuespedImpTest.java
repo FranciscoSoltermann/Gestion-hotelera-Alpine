@@ -3,7 +3,7 @@ package org.TPDesarrollo.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.TPDesarrollo.clases.Huesped;
+import org.TPDesarrollo.entity.Huesped;
 import org.TPDesarrollo.dtos.HuespedDTO;
 import org.TPDesarrollo.enums.TipoDocumento;
 import org.TPDesarrollo.exceptions.DniExistente;

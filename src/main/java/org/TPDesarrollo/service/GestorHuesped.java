@@ -1,6 +1,6 @@
 package org.TPDesarrollo.service;
 
-import org.TPDesarrollo.clases.Huesped;
+import org.TPDesarrollo.entity.Huesped;
 import org.TPDesarrollo.dtos.HuespedDTO;
 import java.util.List;
 

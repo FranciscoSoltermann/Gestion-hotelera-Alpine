@@ -3,8 +3,8 @@ package org.TPDesarrollo.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import org.TPDesarrollo.clases.Habitacion;
-import org.TPDesarrollo.clases.Reserva;
+import org.TPDesarrollo.entity.Habitacion;
+import org.TPDesarrollo.entity.Reserva;
 import org.TPDesarrollo.dtos.ReservaDTO;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import org.TPDesarrollo.repository.HabitacionRepository;
@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class GestorReservaImpTest {

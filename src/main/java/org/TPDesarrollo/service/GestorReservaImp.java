@@ -1,6 +1,6 @@
 package org.TPDesarrollo.service;
 
-import org.TPDesarrollo.clases.*;
+import org.TPDesarrollo.entity.*;
 import org.TPDesarrollo.dtos.OcupanteDTO;
 import org.TPDesarrollo.dtos.ReservaDTO;
 import org.TPDesarrollo.enums.EstadoHabitacion;
@@ -100,7 +100,7 @@ public class GestorReservaImp implements GestorReserva {
                         Ocupante ocupante = new Ocupante();
                         ocupante.setNombre(oDto.getNombre());
                         ocupante.setApellido(oDto.getApellido());
-                        ocupante.setDni(oDto.getDni());
+                        ocupante.setDocumento(oDto.getDni());
                         ocupante.setTelefono("-");
                         ocupante.setTipoDocumento(TipoDocumento.DNI);
                         ocupante.setHabitacion(h);

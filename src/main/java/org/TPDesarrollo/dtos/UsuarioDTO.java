@@ -2,13 +2,16 @@ package org.TPDesarrollo.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.TPDesarrollo.validaciones.ValidPassword;
 
-/**
- * DTO para la transferencia de datos de usuario.
- * Incluye validaciones para los campos nombre y contrasenia.
- * Utiliza una anotación personalizada @ValidPassword para validar la contraseña.
- */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UsuarioDTO {
 
     @NotBlank(message = "El nombre de usuario no puede estar vacío")
@@ -17,17 +20,4 @@ public class UsuarioDTO {
 
     @ValidPassword
     private String contrasenia;
-
-    public UsuarioDTO() {}
-
-    public UsuarioDTO(String nombre, String contrasenia) {
-        this.nombre = nombre;
-        this.contrasenia = contrasenia;
-    }
-
-    //Getters y Setters
-    public String getNombre() { return nombre; }
-    public String getContrasenia() { return contrasenia; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public void setContrasenia(String contrasenia) { this.contrasenia = contrasenia; }
 }

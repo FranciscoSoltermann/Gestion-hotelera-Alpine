@@ -1,7 +1,7 @@
 package org.TPDesarrollo.service;
 
-import org.TPDesarrollo.clases.Habitacion;
-import org.TPDesarrollo.clases.Reserva;
+import org.TPDesarrollo.entity.Habitacion;
+import org.TPDesarrollo.entity.Reserva;
 import org.TPDesarrollo.dtos.EstadoDiaDTO;
 import org.TPDesarrollo.dtos.GrillaHabitacionDTO;
 import org.TPDesarrollo.enums.EstadoHabitacion;
