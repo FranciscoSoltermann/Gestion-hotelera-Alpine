@@ -24,9 +24,6 @@ public class Credito extends MedioDePago {
     @Column(name = "fecha_vencimiento")
     private String fechaVencimiento;
 
-    @Column(name = "codigo_seguridad")
-    private int codigoSeguridad;
-
     @Column(name = "cuotas")
     private int cuotas;
 

@@ -24,9 +24,6 @@ public class Debito extends MedioDePago {
     @Column(name = "fecha_vencimiento")
     private String fechaVencimiento;
 
-    @Column(name = "codigo_seguridad")
-    private int codigoSeguridad;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private RedDePago redDePago;

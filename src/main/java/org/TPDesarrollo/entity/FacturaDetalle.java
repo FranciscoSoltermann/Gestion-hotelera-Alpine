@@ -31,9 +31,6 @@ public class FacturaDetalle {
     @Column(nullable = false)
     private Integer cantidad;
 
-    @Column(nullable = false, length = 10)
-    private String unidadMedida;
-
     @Column(nullable = false)
     private Float precioUnitario;
 

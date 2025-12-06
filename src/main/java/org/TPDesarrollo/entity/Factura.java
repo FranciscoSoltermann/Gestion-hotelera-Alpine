@@ -35,14 +35,8 @@ public class Factura {
     @Column(name = "estado_factura", length = 10)
     private EstadoFactura estado;
 
-    @Column(name = "numero_habitacion", length = 5)
-    private String numeroHabitacion;
-
     @Column(nullable = false)
     private LocalDate fechaEmision;
-
-    @Column(nullable = false)
-    private LocalDateTime fechaHoraSalida;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_factura", length = 1)
