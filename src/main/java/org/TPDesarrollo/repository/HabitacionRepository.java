@@ -35,11 +35,6 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Integer>
             @Param("fechaEgreso") LocalDate fechaEgreso
     );
 
-
-    @Query("SELECT h FROM Habitacion h WHERE TYPE(h) = :clazz")
-    <T extends Habitacion> List<T> findByTipo(Class<T> clazz);
-
-
     @Query("""
        SELECT h FROM Habitacion h
        WHERE h.ingreso IS NOT NULL 

@@ -19,4 +19,7 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Integer> {
                   "LEFT JOIN FETCH e.itemsConsumo c " +
                   "WHERE h.idHabitacion = :idHabitacion AND e.fechaHoraEgreso IS NULL")
     Optional<Estadia> findEstadiaActivaConDetalles(@Param("idHabitacion") Integer idHabitacion);
+
+    @Query("SELECT e FROM Estadia e WHERE e.habitacion.numero = :numeroHabitacion AND e.fechaHoraEgreso IS NULL")
+    Optional<Estadia> findEstadiaActivaPorHabitacion(@Param("numeroHabitacion") String numeroHabitacion);
 }

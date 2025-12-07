@@ -45,11 +45,6 @@ public class Estadia {
     @JoinColumn(name = "id_reserva", nullable = false)
     private Reserva reserva;
 
-    @ManyToMany
-    @JoinTable(
-            name = "estadias_items_consumo",
-            joinColumns = @JoinColumn(name = "estadia_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_consumo_id")
-    )
+    @OneToMany(mappedBy = "estadia", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Consumo> itemsConsumo;
 }
