@@ -34,6 +34,10 @@ public class Estadia {
     private LocalDateTime fechaHoraEgreso;
 
     @ManyToOne
+    @JoinColumn(name = "huesped_id", nullable = false)
+    private Huesped huesped;
+    
+    @ManyToOne
     @JoinColumn(name = "habitacion_id", nullable = false)
     private Habitacion habitacion;
 

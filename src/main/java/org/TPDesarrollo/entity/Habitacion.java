@@ -27,7 +27,8 @@ public class Habitacion {
     @Column(name = "capacidad")
     private Integer capacidad;
 
-    @Column(name = "estado")
+    @Column(name = "estado", length = 255)
+    @Enumerated(EnumType.STRING)
     private EstadoHabitacion estado;
 
     @Column(name = "ingreso")
