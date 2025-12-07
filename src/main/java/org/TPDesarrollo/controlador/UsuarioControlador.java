@@ -1,11 +1,11 @@
 package org.TPDesarrollo.controlador;
 
 import jakarta.validation.Valid;
-import org.TPDesarrollo.clases.Usuario;
-import org.TPDesarrollo.dtos.UsuarioDTO;
+import org.TPDesarrollo.entity.Usuario;
+import org.TPDesarrollo.dto.UsuarioDTO;
 import org.TPDesarrollo.exceptions.ContraseniaInvalida;
 import org.TPDesarrollo.exceptions.UsuarioNoEncontrado;
-import org.TPDesarrollo.gestores.GestorUsuario;
+import org.TPDesarrollo.service.GestorUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

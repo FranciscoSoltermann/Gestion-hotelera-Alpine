@@ -1,7 +1,7 @@
 package org.TPDesarrollo.controlador;
 
-import org.TPDesarrollo.dtos.GrillaHabitacionDTO;
-import org.TPDesarrollo.gestores.GestorHabitacion;
+import org.TPDesarrollo.dto.GrillaHabitacionDTO;
+import org.TPDesarrollo.service.GestorHabitacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;

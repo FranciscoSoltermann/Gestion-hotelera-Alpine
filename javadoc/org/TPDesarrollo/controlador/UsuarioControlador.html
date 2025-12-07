@@ -107,7 +107,7 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.TPDesarrollo.gestores.GestorUsuario)" class="member-name-link">UsuarioControlador</a><wbr>(<a href="../gestores/GestorUsuario.html" title="class in org.TPDesarrollo.gestores">GestorUsuario</a>&nbsp;gestorUsuario)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.TPDesarrollo.gestores.GestorUsuario)" class="member-name-link">UsuarioControlador</a><wbr>(<a href="../gestores/GestorUsuario.html" title="class in org.TPDesarrollo.service">GestorUsuario</a>&nbsp;gestorUsuario)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -124,10 +124,10 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#login(org.TPDesarrollo.dtos.UsuarioDTO)" class="member-name-link">login</a><wbr>(<a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dtos">UsuarioDTO</a>&nbsp;datos)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#login(org.TPDesarrollo.dtos.UsuarioDTO)" class="member-name-link">login</a><wbr>(<a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dto">UsuarioDTO</a>&nbsp;datos)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;?&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#registrarUsuario(org.TPDesarrollo.dtos.UsuarioDTO)" class="member-name-link">registrarUsuario</a><wbr>(@Valid <a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dtos">UsuarioDTO</a>&nbsp;datos)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#registrarUsuario(org.TPDesarrollo.dtos.UsuarioDTO)" class="member-name-link">registrarUsuario</a><wbr>(@Valid <a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dto">UsuarioDTO</a>&nbsp;datos)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -151,7 +151,7 @@ loadScripts(document, 'script');</script>
 <h3>UsuarioControlador</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@Autowired
-</span><span class="modifiers">public</span>&nbsp;<span class="element-name">UsuarioControlador</span><wbr><span class="parameters">(<a href="../gestores/GestorUsuario.html" title="class in org.TPDesarrollo.gestores">GestorUsuario</a>&nbsp;gestorUsuario)</span></div>
+</span><span class="modifiers">public</span>&nbsp;<span class="element-name">UsuarioControlador</span><wbr><span class="parameters">(<a href="../gestores/GestorUsuario.html" title="class in org.TPDesarrollo.service">GestorUsuario</a>&nbsp;gestorUsuario)</span></div>
 </div>
 </section>
 </li>
@@ -169,7 +169,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@PostMapping("/login")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;?&gt;</span>&nbsp;<span class="element-name">login</span><wbr><span class="parameters">(@RequestBody
- <a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dtos">UsuarioDTO</a>&nbsp;datos)</span>
+ <a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dto">UsuarioDTO</a>&nbsp;datos)</span>
                                                  throws <span class="exceptions"><a href="../exceptions/UsuarioNoEncontrado.html" title="class in org.TPDesarrollo.exceptions">UsuarioNoEncontrado</a>,
 <a href="../exceptions/ContraseniaInvalida.html" title="class in org.TPDesarrollo.exceptions">ContraseniaInvalida</a></span></div>
 <dl class="notes">
@@ -186,7 +186,7 @@ loadScripts(document, 'script');</script>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="annotations">@PostMapping("/registrar")
 </span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;?&gt;</span>&nbsp;<span class="element-name">registrarUsuario</span><wbr><span class="parameters">(@Valid @RequestBody
- @Valid <a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dtos">UsuarioDTO</a>&nbsp;datos)</span></div>
+ @Valid <a href="../dtos/UsuarioDTO.html" title="class in org.TPDesarrollo.dto">UsuarioDTO</a>&nbsp;datos)</span></div>
 </div>
 </section>
 </li>

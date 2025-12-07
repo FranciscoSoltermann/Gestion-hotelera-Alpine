@@ -1,6 +1,6 @@
 package org.TPDesarrollo.repository;
 
-import org.TPDesarrollo.clases.Huesped;
+import org.TPDesarrollo.entity.Huesped;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.TPDesarrollo.enums.TipoDocumento;
