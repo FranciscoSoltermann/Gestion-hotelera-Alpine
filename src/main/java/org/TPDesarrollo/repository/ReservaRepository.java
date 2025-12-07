@@ -16,13 +16,18 @@ import java.util.List;
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
-
-    @Query("SELECT r FROM Reserva r WHERE r.habitacion.id = :idHabitacion " +
+    // CORREGIDO: Cambiamos 'r.habitacion.id' por 'r.habitacion.idHabitacion'
+    // También agregamos @Param para vincular correctamente los parámetros :nombre
+    @Query("SELECT r FROM Reserva r WHERE r.habitacion.idHabitacion = :idHabitacion " +
             "AND r.estado <> 'CANCELADA' " +
             "AND ((r.ingreso BETWEEN :ingreso AND :egreso) " +
             "OR (r.egreso BETWEEN :ingreso AND :egreso) " +
             "OR (:ingreso BETWEEN r.ingreso AND r.egreso))")
-    List<Reserva> encontrarSolapamientos(Integer idHabitacion, LocalDate ingreso, LocalDate egreso);
+    List<Reserva> encontrarSolapamientos(
+            @Param("idHabitacion") Integer idHabitacion,
+            @Param("ingreso") LocalDate ingreso,
+            @Param("egreso") LocalDate egreso
+    );
 
     @Query("SELECT r FROM Reserva r WHERE r.ingreso < :hasta AND r.egreso > :desde")
     List<Reserva> encontrarReservasEnRango(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
