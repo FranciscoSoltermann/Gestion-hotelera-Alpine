@@ -28,6 +28,9 @@ public class FacturaDetalle {
     @Column(nullable = false, length = 255)
     private String descripcion;
 
+    @Column(length = 50)
+    private String medida;
+
     @Column(nullable = false)
     private Integer cantidad;
 

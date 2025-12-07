@@ -2,6 +2,7 @@ package org.TPDesarrollo.configuracion;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,7 +34,7 @@ public class SecurityConfig {
         http
                 // Desactivamos CSRF (necesario para que funcionen los POST desde Postman/React en este tipo de API)
                 .csrf(AbstractHttpConfigurer::disable)
-
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/huespedes/**").permitAll()
@@ -41,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/habitaciones/**").permitAll()
                         .requestMatchers("/api/facturas/**").permitAll()
                         .requestMatchers("/api/responsables/**").permitAll()
+                        .requestMatchers("/api/consumos/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

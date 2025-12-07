@@ -17,6 +17,7 @@ public interface GestorReserva {
      */
     List<Reserva> crearOcupacion(ReservaDTO dto);
 
+
     /**
      * Elimina una reserva existente dado su ID (si se conoce).
      */

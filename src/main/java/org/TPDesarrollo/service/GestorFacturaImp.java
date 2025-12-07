@@ -66,6 +66,7 @@ public class GestorFacturaImp implements GestorFactura {
         // Agregar el costo base de la estadía
         items.add(0, ItemFacturableDTO.builder()
                 .descripcion("Estadía Habitación " + numeroHabitacion + " (" + estadia.getHabitacion().getClass().getSimpleName() + ")")
+                .medida("NOCHES")
                 .cantidad((int) dias)
                 .precioUnitario(precioNoche)
                 .subtotal(precioNoche * dias)
@@ -75,13 +76,17 @@ public class GestorFacturaImp implements GestorFactura {
         // 5. Cargar consumos
         if (estadia.getItemsConsumo() != null) {
             for (Consumo consumo : estadia.getItemsConsumo()) {
+
+                float subtotalConsumo = consumo.getPrecioUnitario() * consumo.getCantidad();
+
                 items.add(ItemFacturableDTO.builder()
                         .descripcion(consumo.getDescripcion())
-                        .cantidad(1)
-                        .precioUnitario(consumo.getPrecio())
-                        .subtotal(consumo.getPrecio())
+                        .medida("UNIDAD")
+                        .cantidad(consumo.getCantidad())
+                        .precioUnitario(consumo.getPrecioUnitario())
+                        .subtotal(subtotalConsumo)
                         .esEstadia(false)
-                        .referenciaId((long) consumo.getIdconsumo())
+                        .referenciaId((long) consumo.getIdConsumo())
                         .build());
             }
         }
@@ -117,14 +122,12 @@ public class GestorFacturaImp implements GestorFactura {
     @Override
     @Transactional
     public Factura generarFactura(SolicitudFacturaDTO solicitud) {
-        // 1. Obtener Entidades
         Estadia estadia = estadiaRepository.findById(solicitud.getIdEstadia().intValue())
                 .orElseThrow(() -> new RuntimeException("Estadía no encontrada"));
 
         ResponsableDePago responsable = responsableRepository.findById(solicitud.getIdResponsablePagoSeleccionado())
                 .orElseThrow(() -> new RuntimeException("Responsable no encontrado"));
 
-        // 2. Crear cabecera de Factura
         Factura factura = Factura.builder()
                 .estado(EstadoFactura.PENDIENTE)
                 .fechaEmision(LocalDate.now())
@@ -133,38 +136,40 @@ public class GestorFacturaImp implements GestorFactura {
                 .estadia(estadia)
                 .build();
 
-        // 3. Procesar items y calcular totales
         float totalFactura = 0f;
         float totalEstadia = 0f;
         List<FacturaDetalle> detalles = new ArrayList<>();
 
         for (ItemFacturableDTO item : solicitud.getItemsAFacturar()) {
+
+            float subtotalReal = item.getPrecioUnitario() * item.getCantidad();
+
             FacturaDetalle detalle = FacturaDetalle.builder()
                     .factura(factura)
                     .descripcion(item.getDescripcion())
+                    .medida(item.getMedida())
                     .cantidad(item.getCantidad())
                     .precioUnitario(item.getPrecioUnitario())
-                    .subtotal(item.getSubtotal())
+                    .subtotal(subtotalReal)
                     .build();
 
             detalles.add(detalle);
-            totalFactura += item.getSubtotal();
+
+            totalFactura += subtotalReal;
 
             if (item.isEsEstadia()) {
-                totalEstadia += item.getSubtotal();
+                totalEstadia += subtotalReal;
             }
         }
 
         factura.setMontoTotal(totalFactura);
         factura.setValorEstadia(totalEstadia);
 
-        // 4. Persistir Factura y Detalles
         Factura facturaGuardada = facturaRepository.save(factura);
 
         detalles.forEach(d -> d.setFactura(facturaGuardada));
         facturaDetalleRepository.saveAll(detalles);
 
-        // 5. Actualizar Estadía (Egreso Real)
         estadia.setFechaHoraEgreso(LocalDateTime.of(LocalDate.now(), solicitud.getHoraSalida()));
         estadiaRepository.save(estadia);
 

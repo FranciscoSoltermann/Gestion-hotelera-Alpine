@@ -19,7 +19,7 @@ import org.TPDesarrollo.enums.EstadoFactura;
 import org.TPDesarrollo.enums.TipoFactura;
 
 @Entity
-@Table(name = "facturas")
+@Table(name = "factura")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,6 +51,6 @@ public class Factura {
     private ResponsableDePago responsableDePago;
 
     @ManyToOne
-    @JoinColumn(name = "id_estadia", nullable = false)
+    @JoinColumn(name = "estadia", nullable = false)
     private Estadia estadia;
 }

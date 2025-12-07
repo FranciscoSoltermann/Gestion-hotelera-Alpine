@@ -9,18 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.util.Collections;
 import java.util.List;
-
-/**
- * Controlador REST para gestionar operaciones relacionadas con huéspedes.
- * Proporciona endpoints para crear, buscar, obtener, modificar y eliminar huéspedes.
- * Utiliza GestorHuesped para la lógica de negocio.
- * Permite peticiones CORS desde una aplicación React en localhost:3000.
- */
 
 @RestController
 @RequestMapping("/api/huespedes")
-@CrossOrigin(origins = "http://localhost:3000") // Permite peticiones CORS
+@CrossOrigin(origins = "http://localhost:3000")
 public class HuespedControlador {
 
     private final GestorHuesped gestorHuesped;
@@ -30,16 +24,12 @@ public class HuespedControlador {
         this.gestorHuesped = gestorHuesped;
     }
 
-
-    //ALTA (POST)
     @PostMapping("/alta")
-    // Crear un nuevo huésped
     public ResponseEntity<?> crearHuesped(@Valid @RequestBody HuespedDTO huespedDTO) {
         Huesped huespedGuardado = gestorHuesped.darDeAltaHuesped(huespedDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(huespedGuardado);
     }
 
-    //BÚSQUEDA GENERAL CON FILTROS (GET)
     @GetMapping("/buscar")
     public ResponseEntity<List<HuespedDTO>> buscarHuespedes(
             @RequestParam(required = false) String apellido,
@@ -53,7 +43,6 @@ public class HuespedControlador {
         return ResponseEntity.ok(huespedes);
     }
 
-    //BÚSQUEDA EXACTA POR DNI (GET)
     @GetMapping("/buscar-por-dni")
     public ResponseEntity<?> buscarPorDni(@RequestParam("dni") String dni) {
         try {
@@ -62,7 +51,6 @@ public class HuespedControlador {
             if (huesped != null) {
                 return ResponseEntity.ok(huesped);
             } else {
-                // Devolvemos 404 Not Found si no existe, para que el front sepa que debe dejar escribir
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
@@ -70,7 +58,6 @@ public class HuespedControlador {
         }
     }
 
-    //OBTENER POR ID (GET /{id})
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerPorId(@PathVariable Integer id) {
         HuespedDTO huesped = gestorHuesped.obtenerHuespedSeleccionado(id);
@@ -81,17 +68,19 @@ public class HuespedControlador {
         return ResponseEntity.ok(huesped);
     }
 
-    //MODIFICAR (PUT)
     @PutMapping("/modificar")
     public ResponseEntity<?> modificarHuesped(@Valid @RequestBody HuespedDTO huespedDTO) {
         gestorHuesped.modificarHuesped(huespedDTO);
         return ResponseEntity.ok("Huésped modificado correctamente");
     }
 
-    //DAR DE BAJA (DELETE)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarHuesped(@PathVariable Integer id) {
-        gestorHuesped.darDeBajaHuesped(id);
-        return ResponseEntity.ok("Huésped eliminado correctamente");
+        try {
+            gestorHuesped.eliminarHuesped(id);
+            return ResponseEntity.ok(Collections.singletonMap("mensaje", "Huésped eliminado correctamente."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
 }

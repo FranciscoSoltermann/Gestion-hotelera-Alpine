@@ -16,5 +16,5 @@ public interface GestorHuesped {
 
     void modificarHuesped(HuespedDTO dto);
 
-    void darDeBajaHuesped(Integer id);
+    void eliminarHuesped(Integer id);
 }
