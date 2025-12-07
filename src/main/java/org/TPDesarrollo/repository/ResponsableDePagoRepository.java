@@ -1,10 +1,17 @@
 package org.TPDesarrollo.repository;
 
+import org.TPDesarrollo.entity.PersonaJuridica;
 import org.TPDesarrollo.entity.ResponsableDePago;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface ResponsableDePagoRepository extends JpaRepository<ResponsableDePago, Integer> {
-    // Aquí puedes agregar métodos personalizados si necesitas buscar por CUIT o DNI en el futuro
+
+    @Query("SELECT p FROM PersonaJuridica p WHERE p.cuit = :cuit")
+    Optional<PersonaJuridica> findByCuit(@Param("cuit") String cuit);
 }

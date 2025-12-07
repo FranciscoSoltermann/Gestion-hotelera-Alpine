@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "responsable_de_pago", schema = "pruebabdd")
+@Table(name = "responsable_pago", schema = "pruebabdd")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,4 +19,12 @@ public abstract class ResponsableDePago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_responsable")
     private Integer id;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_direccion", referencedColumnName = "id_direccion")
+    private Direccion direccion;
+
+    @Column(name = "telefono")
+    private String telefono;
+
 }

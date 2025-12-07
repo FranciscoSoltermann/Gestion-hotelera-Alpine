@@ -11,4 +11,12 @@ import java.util.Optional;
 public interface EstadiaRepository extends JpaRepository<Estadia, Integer> {
 
     Optional<Estadia> findByHabitacionIdHabitacionAndFechaHoraEgresoIsNull(Integer idHabitacion);
+
+    @Query("SELECT e FROM Estadia e " +
+                  "JOIN FETCH e.habitacion h " +
+                  "LEFT JOIN FETCH e.reserva r " +
+                  "LEFT JOIN FETCH r.huesped rh " + // Aseguramos que el Huesped titular se cargue también
+                  "LEFT JOIN FETCH e.itemsConsumo c " +
+                  "WHERE h.idHabitacion = :idHabitacion AND e.fechaHoraEgreso IS NULL")
+    Optional<Estadia> findEstadiaActivaConDetalles(@Param("idHabitacion") Integer idHabitacion);
 }

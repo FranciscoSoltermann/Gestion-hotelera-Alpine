@@ -33,12 +33,10 @@ public class GestorFacturaImp implements GestorFactura {
     @Transactional(readOnly = true)
     public ResumenFacturacionDTO buscarEstadiaParaFacturar(String numeroHabitacion, LocalTime horaSalida) {
 
-        // 1. BÚSQUEDA EN DOS PASOS: Número (String) -> ID (Integer)
         Habitacion habitacion = habitacionRepository.findByNumero(numeroHabitacion)
                 .orElseThrow(() -> new RuntimeException("Habitación con número " + numeroHabitacion + " no encontrada."));
 
-        // 2. Buscar estadía activa por el ID interno de la Habitacion.
-        Estadia estadia = estadiaRepository.findByHabitacionIdHabitacionAndFechaHoraEgresoIsNull(habitacion.getIdHabitacion())
+        Estadia estadia = estadiaRepository.findEstadiaActivaConDetalles(habitacion.getIdHabitacion())
                 .orElseThrow(() -> new RuntimeException("No hay estadía activa para la habitación " + numeroHabitacion));
 
         List<ItemFacturableDTO> items = new ArrayList<>();
@@ -90,7 +88,7 @@ public class GestorFacturaImp implements GestorFactura {
 
         double total = items.stream().mapToDouble(ItemFacturableDTO::getSubtotal).sum();
 
-        // 6. Obtener Posibles Responsables de Pago (SIMPLIFICADO)
+        /* 6. Obtener Posibles Responsables de Pago (SIMPLIFICADO) */
         List<ResponsableDePagoDTO> posiblesResponsables = new ArrayList<>();
 
         // Usamos la Reserva referenciada directamente por la Estadia (que fue el objeto de la corrección inicial)
