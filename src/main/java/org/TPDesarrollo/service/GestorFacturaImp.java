@@ -27,20 +27,24 @@ public class GestorFacturaImp implements GestorFactura {
     private final ResponsableDePagoRepository responsableRepository;
     private final ReservaRepository reservaRepository;
     private final HuespedRepository huespedRepository;
+    private final HabitacionRepository habitacionRepository;
 
     @Override
     @Transactional(readOnly = true)
     public ResumenFacturacionDTO buscarEstadiaParaFacturar(String numeroHabitacion, LocalTime horaSalida) {
-        // 1. Buscar estadía activa
-        Estadia estadia = estadiaRepository.findEstadiaActivaPorHabitacion(numeroHabitacion)
+
+        Habitacion habitacion = habitacionRepository.findByNumero(numeroHabitacion)
+                .orElseThrow(() -> new RuntimeException("Habitación con número " + numeroHabitacion + " no encontrada."));
+
+        Estadia estadia = estadiaRepository.findEstadiaActivaConDetalles(habitacion.getIdHabitacion())
                 .orElseThrow(() -> new RuntimeException("No hay estadía activa para la habitación " + numeroHabitacion));
 
         List<ItemFacturableDTO> items = new ArrayList<>();
 
-        // 2. Determinar precio real según el tipo de habitación
+        // 3. Determinar precio real según el tipo de habitación
         float precioNoche = obtenerPrecioPorHabitacion(estadia.getHabitacion());
 
-        // 3. Calcular días y recargos
+        // 4. Calcular días y recargos
         long dias = ChronoUnit.DAYS.between(estadia.getFechaHoraIngreso(), LocalDateTime.of(LocalDate.now(), horaSalida));
         if (dias == 0) dias = 1; // Cobrar al menos una noche
 
@@ -68,7 +72,7 @@ public class GestorFacturaImp implements GestorFactura {
                 .esEstadia(true)
                 .build());
 
-        // 4. Cargar consumos [cite: 28]
+        // 5. Cargar consumos
         if (estadia.getItemsConsumo() != null) {
             for (Consumo consumo : estadia.getItemsConsumo()) {
                 items.add(ItemFacturableDTO.builder()
@@ -84,41 +88,29 @@ public class GestorFacturaImp implements GestorFactura {
 
         double total = items.stream().mapToDouble(ItemFacturableDTO::getSubtotal).sum();
 
-        // 5. Obtener Posibles Responsables de Pago (Ocupantes / Titular de Reserva)
+        /* 6. Obtener Posibles Responsables de Pago (SIMPLIFICADO) */
         List<ResponsableDePagoDTO> posiblesResponsables = new ArrayList<>();
 
-        // Buscamos la reserva asociada a la habitación para encontrar al titular
-        // Nota: Asumimos que existe un método en ReservaRepository para esto, o filtramos las reservas activas.
-        // Si no tienes el método exacto, deberás agregarlo en ReservaRepository.
-        reservaRepository.findAll().stream()
-                .filter(r -> r.getHabitacion().getIdHabitacion().equals(estadia.getHabitacion().getIdHabitacion())
-                        && r.getIngreso().isBefore(LocalDate.now().plusDays(1))
-                        && r.getEgreso().isAfter(LocalDate.now().minusDays(1)))
-                .findFirst()
-                .ifPresent(reserva -> {
-                    Integer idTitular = reserva.getHuesped().getId(); // 1. Obtenemos el ID numérico
+        // Usamos la Reserva referenciada directamente por la Estadia (que fue el objeto de la corrección inicial)
+        if (estadia.getReserva() != null && estadia.getReserva().getHuesped() != null) {
+            Huesped titular = estadia.getReserva().getHuesped();
 
-                    if (idTitular != null) {
-                        huespedRepository.findById(idTitular).ifPresent(titular -> {
+            posiblesResponsables.add(ResponsableDePagoDTO.builder()
+                    .id(titular.getId())
+                    .nombreCompleto(titular.getApellido() + " " + titular.getNombre())
+                    .documento(titular.getDocumento())
+                    .tipo("FISICA")
+                    .build());
+        }
 
-                            posiblesResponsables.add(ResponsableDePagoDTO.builder()
-                                    .id(titular.getId())
-                                    .nombreCompleto(titular.getApellido() + " " + titular.getNombre())
-                                    .documento(titular.getDocumento())
-                                    .tipo("FISICA")
-                                    .build());
-                        });
-                    }
-                });
-
-        // 6. Retornar DTO final
+        // 7. Retornar DTO final
         return ResumenFacturacionDTO.builder()
                 .idEstadia((long) estadia.getIdestadia())
                 .numeroHabitacion(numeroHabitacion)
                 .items(items)
                 .posiblesResponsables(posiblesResponsables)
                 .montoTotal(total)
-                .tipoFacturaSugerido(TipoFactura.B) // Por defecto Consumidor Final
+                .tipoFacturaSugerido(TipoFactura.B)
                 .build();
     }
 

@@ -34,13 +34,13 @@ public class SecurityConfig {
                 // Desactivamos CSRF (necesario para que funcionen los POST desde Postman/React en este tipo de API)
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // Configuramos las reglas de las URL
                 .authorizeHttpRequests(auth -> auth
-                        // Permitimos entrar a TODOS a las rutas de usuario (login, registrar)
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/huespedes/**").permitAll()
                         .requestMatchers("/api/reservas/**").permitAll()
                         .requestMatchers("/api/habitaciones/**").permitAll()
+                        .requestMatchers("/api/facturas/**").permitAll()
+                        .requestMatchers("/api/responsables/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
