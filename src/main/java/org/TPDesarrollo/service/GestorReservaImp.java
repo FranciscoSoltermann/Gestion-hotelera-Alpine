@@ -11,6 +11,8 @@ import org.TPDesarrollo.repository.HuespedRepository;
 import org.TPDesarrollo.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.TPDesarrollo.repository.EstadiaRepository;
+import java.time.LocalDateTime;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,8 +27,7 @@ public class GestorReservaImp implements GestorReserva {
     private final HabitacionRepository habitacionRepository;
     private final ReservaRepository reservaRepository;
     private final HuespedRepository huespedRepository;
-
-    // --- MÉTODOS PÚBLICOS DE LA INTERFAZ ---
+    private final EstadiaRepository estadiaRepository;
 
     @Override
     @Transactional
@@ -40,71 +41,54 @@ public class GestorReservaImp implements GestorReserva {
         return procesarReserva(dto, "OCUPADA");
     }
 
-    // --- LÓGICA CENTRAL (Tu código original restaurado) ---
-
     private List<Reserva> procesarReserva(ReservaDTO dto, String estadoNuevo) {
 
-        // 1. Validaciones básicas
         if (dto.getIngreso().isAfter(dto.getEgreso())) {
             throw new IllegalArgumentException("La fecha de ingreso debe ser anterior al egreso");
         }
 
-        // Buscamos todas las habitaciones por sus IDs
         List<Habitacion> habitaciones = habitacionRepository.findAllById(dto.getHabitaciones());
 
         if (habitaciones.isEmpty() || habitaciones.size() != dto.getHabitaciones().size()) {
             throw new RuntimeException("Alguna habitación solicitada no existe o la lista está vacía");
         }
 
-        // 2. Obtener/Guardar TITULAR
         Huesped titular = obtenerOGuardarHuesped(dto.getHuesped());
 
-        // 3. Preparar variables
         Map<Integer, List<OcupanteDTO>> mapaOcupantes = dto.getOcupantesPorHabitacion();
         List<Reserva> reservasGuardadas = new ArrayList<>();
 
-        // 4. PROCESAR CADA HABITACIÓN
         for (Habitacion h : habitaciones) {
 
-            // Buscamos conflictos de fecha en la BD
-            // NOTA: Asegúrate de tener este método en tu ReservaRepository
             List<Reserva> conflictos = reservaRepository.encontrarSolapamientos(
                     h.getIdHabitacion(), dto.getIngreso(), dto.getEgreso()
             );
 
             Reserva reservaAProcesar = null;
 
-            // --- LÓGICA DE DETECCIÓN DE CHECK-IN ---
             if (!conflictos.isEmpty()) {
 
                 if ("OCUPADA".equals(estadoNuevo)) {
-                    // Hay solapamiento. Verificamos si es el MISMO dueño haciendo Check-in.
                     Optional<Reserva> miReservaPrevia = conflictos.stream()
-                            // Comparamos IDs (usando getters de objeto)
                             .filter(r -> r.getHuesped().getId().equals(titular.getId()))
                             .filter(r -> "RESERVADA".equals(r.getEstado()))
                             .findFirst();
 
                     if (miReservaPrevia.isPresent()) {
-                        // ¡ENCONTRADO! Reutilizamos la reserva existente.
                         reservaAProcesar = miReservaPrevia.get();
                         reservaAProcesar.setEstado("OCUPADA");
 
-                        // Opcional: Actualizar fechas si cambiaron ligeramente
-                        // reservaAProcesar.setIngreso(dto.getIngreso());
-                        // reservaAProcesar.setEgreso(dto.getEgreso());
+                        reservaAProcesar.setIngreso(dto.getIngreso());
+                        reservaAProcesar.setEgreso(dto.getEgreso());
 
                     } else {
-                        // El conflicto es con OTRA persona o ya está OCUPADA.
                         throw new RuntimeException("La habitación " + h.getNumero() + " ya está ocupada por otro huésped.");
                     }
                 } else {
-                    // Si estoy intentando RESERVAR y ya hay algo, es error directo.
                     throw new RuntimeException("La habitación " + h.getNumero() + " ya está reservada en esas fechas.");
                 }
             }
 
-            // Si no había conflicto, o no era una reserva previa -> Creamos NUEVA (Walk-in o Reserva nueva)
             if (reservaAProcesar == null) {
                 reservaAProcesar = new Reserva();
                 // Ajusta los nombres de los setters según tu Entidad Reserva (ej: setFechaInicio vs setIngreso)
@@ -115,26 +99,54 @@ public class GestorReservaImp implements GestorReserva {
                 reservaAProcesar.setHabitacion(h);
             }
 
+            reservaAProcesar = reservaRepository.save(reservaAProcesar);
+
+            if ("OCUPADA".equals(estadoNuevo)) {
+
+                Estadia estadia = Estadia.builder()
+                        .huesped(titular)
+                        .habitacion(h)
+                        .reserva(reservaAProcesar)
+                        .fechaHoraIngreso(LocalDateTime.now())
+                        .fechaIngreso(reservaAProcesar.getIngreso().toString())
+                        .fechaEgreso(reservaAProcesar.getEgreso().toString())
+                        .itemsConsumo(new ArrayList<>())
+                        .build();
+
+                estadiaRepository.save(estadia);
+            }
+
+            // --- PASO CLAVE 3: CARGA DE ACOMPAÑANTES (Ocupantes) ---
+            // Si el proceso es un Check-in sobre una reserva existente, es buena práctica
+            // limpiar la lista de ocupantes para evitar duplicados si se vuelven a cargar
+            if (reservaAProcesar.getIdReserva() != null && "OCUPADA".equals(estadoNuevo)) {
+                if (reservaAProcesar.getOcupantes() != null) {
+                    reservaAProcesar.getOcupantes().clear();
+                }
+            }
+
             // --- CARGA DE ACOMPAÑANTES (Ocupantes) ---
             if (mapaOcupantes != null && mapaOcupantes.containsKey(h.getIdHabitacion())) {
                 List<OcupanteDTO> listaDTOs = mapaOcupantes.get(h.getIdHabitacion());
 
                 for (OcupanteDTO oDto : listaDTOs) {
+
                     if (oDto.getNombre() != null && !oDto.getNombre().isBlank()) {
 
-                        // Asegúrate de tener la entidad Ocupante importada
+                        String apellido = (oDto.getApellido() != null && !oDto.getApellido().isBlank())
+                                ? oDto.getApellido() : "SIN_APELLIDO";
+                        String documento = (oDto.getDni() != null && !oDto.getDni().isBlank())
+                                ? oDto.getDni() : "00000000";
+
                         Ocupante ocupante = new Ocupante();
                         ocupante.setNombre(oDto.getNombre());
-                        ocupante.setApellido(oDto.getApellido());
-                        ocupante.setDocumento(oDto.getDni());
+                        ocupante.setApellido(apellido);
+                        ocupante.setDocumento(documento);
                         ocupante.setTelefono("-");
                         ocupante.setTipoDocumento(TipoDocumento.DNI);
-
-                        // Relaciones
                         ocupante.setReserva(reservaAProcesar);
-                        ocupante.setHabitacion(h); // Tu lógica original pedía esto
+                        ocupante.setHabitacion(h);
 
-                        // Agregamos a la lista de la reserva (asegúrate que Reserva tenga la lista inicializada)
                         if (reservaAProcesar.getOcupantes() == null) {
                             reservaAProcesar.setOcupantes(new ArrayList<>());
                         }
@@ -143,7 +155,6 @@ public class GestorReservaImp implements GestorReserva {
                 }
             }
 
-            // Guardamos (update o insert)
             reservasGuardadas.add(reservaRepository.save(reservaAProcesar));
         }
 
@@ -156,12 +167,17 @@ public class GestorReservaImp implements GestorReserva {
         Huesped huesped = huespedRepository.findByDocumento(datos.getDocumento());
 
         if (huesped == null) {
+
+            String apellido = (datos.getApellido() != null && !datos.getApellido().isBlank())
+                    ? datos.getApellido() : "SIN_APELLIDO";
+            String nombre = (datos.getNombre() != null && !datos.getNombre().isBlank())
+                    ? datos.getNombre() : "SIN_NOMBRE";
+
             huesped = Huesped.builder()
-                    .nombre(datos.getNombre())
-                    .apellido(datos.getApellido())
+                    .nombre(nombre)
+                    .apellido(apellido)
                     .documento(datos.getDocumento())
                     .telefono(datos.getTelefono())
-                    // Valores por defecto de tu código original
                     .fechaNacimiento(LocalDate.of(2000, 1, 1))
                     .nacionalidad("Arg")
                     .ocupacion("-")
@@ -169,23 +185,8 @@ public class GestorReservaImp implements GestorReserva {
                     .posicionIVA(RazonSocial.Consumidor_Final)
                     .build();
 
-            // Manejo de Enum TipoDocumento con seguridad
-            try {
-                huesped.setTipoDocumento(TipoDocumento.valueOf(datos.getTipoDocumento().toUpperCase()));
-            } catch (Exception e) {
-                huesped.setTipoDocumento(TipoDocumento.DNI);
-            }
-
-            // Manejo de Dirección (Entidad o Embeddable)
-            // Asumiendo que Direccion es una clase @Embeddable o Entity
-            Direccion d = new Direccion();
-            d.setCalle("-"); d.setNumero("-"); d.setLocalidad("-");
-            d.setProvincia("-"); d.setPais("Argentina"); d.setCodigoPostal("0");
-            huesped.setDireccion(d);
-
-            return huespedRepository.save(huesped);
+            return huespedRepository.saveAndFlush(huesped);
         } else {
-            // Actualizar teléfono si viene nuevo (Tu lógica original)
             if (datos.getTelefono() != null && !datos.getTelefono().isEmpty()) {
                 huesped.setTelefono(datos.getTelefono());
                 return huespedRepository.save(huesped);
