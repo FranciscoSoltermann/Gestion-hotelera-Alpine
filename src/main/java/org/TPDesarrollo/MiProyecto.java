@@ -1,4 +1,3 @@
-// src/main/java/org/TPDesarrollo/MiProyecto.java
 package org.TPDesarrollo;
 /**
  * Clase principal de la aplicación Spring Boot.

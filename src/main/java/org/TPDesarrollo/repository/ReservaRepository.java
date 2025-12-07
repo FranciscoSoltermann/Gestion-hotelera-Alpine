@@ -1,6 +1,6 @@
 package org.TPDesarrollo.repository;
 
-import org.TPDesarrollo.clases.Reserva;
+import org.TPDesarrollo.entity.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,18 +17,12 @@ import java.util.List;
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
 
-    // Para el GestorReserva (validar solapamientos)
-    // Buscar reservas que se solapen con un rango de fechas dado para una habitación específica
-    @Query("""
-        SELECT r FROM Reserva r
-        WHERE r.habitacion.id = :idHabitacion
-        AND (r.ingreso < :egreso AND r.egreso > :ingreso)
-    """)
-    List<Reserva> encontrarSolapamientos(
-            @Param("idHabitacion") Integer idHabitacion,
-            @Param("ingreso") LocalDate ingreso,
-            @Param("egreso") LocalDate egreso
-    );
+    @Query("SELECT r FROM Reserva r WHERE r.habitacion.id = :idHabitacion " +
+            "AND r.estado <> 'CANCELADA' " +
+            "AND ((r.ingreso BETWEEN :ingreso AND :egreso) " +
+            "OR (r.egreso BETWEEN :ingreso AND :egreso) " +
+            "OR (:ingreso BETWEEN r.ingreso AND r.egreso))")
+    List<Reserva> encontrarSolapamientos(Integer idHabitacion, LocalDate ingreso, LocalDate egreso);
 
     @Query("SELECT r FROM Reserva r WHERE r.ingreso < :hasta AND r.egreso > :desde")
     List<Reserva> encontrarReservasEnRango(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);

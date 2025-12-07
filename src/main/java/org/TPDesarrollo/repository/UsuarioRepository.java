@@ -1,6 +1,6 @@
 package org.TPDesarrollo.repository;
 
-import org.TPDesarrollo.clases.Usuario;
+import org.TPDesarrollo.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
