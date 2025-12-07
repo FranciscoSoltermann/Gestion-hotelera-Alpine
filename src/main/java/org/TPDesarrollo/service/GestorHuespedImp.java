@@ -9,6 +9,7 @@ import org.TPDesarrollo.exceptions.DniExistente;
 import org.TPDesarrollo.mappers.HuespedMapper;
 import org.TPDesarrollo.repository.HuespedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,8 +104,16 @@ public class GestorHuespedImp implements GestorHuesped {
     }
 
     @Override
-    @Transactional
-    public void darDeBajaHuesped(Integer id) {
-        huespedRepository.deleteById(id);
+    public void eliminarHuesped(Integer id) {
+        if (!huespedRepository.existsById(id)) {
+            throw new RuntimeException("El huésped con ID " + id + " no existe.");
+        }
+
+        try {
+            huespedRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            // Esta excepción salta si el huésped tiene Reservas o Estadías asociadas (FK constraint)
+            throw new RuntimeException("No se puede eliminar el huésped porque tiene Reservas o Estadías asociadas. Debe anularlas primero.");
+        }
     }
 }

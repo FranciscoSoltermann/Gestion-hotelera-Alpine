@@ -18,4 +18,6 @@ public interface GestorReserva {
      * Si no, crea una nueva (Walk-in).
      */
     List<Reserva> crearOcupacion(ReservaDTO dto);
+
+
 }
