@@ -70,6 +70,5 @@ public class Factura {
     private Double saldoPendiente;
 
     @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore // Importante para evitar recursión en el JSON.
     private List<FacturaDetalle> detalles = new ArrayList<>();
 }

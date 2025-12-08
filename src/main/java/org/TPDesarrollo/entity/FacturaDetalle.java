@@ -1,5 +1,6 @@
 package org.TPDesarrollo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,6 +52,7 @@ public class FacturaDetalle {
     @ManyToOne
     @JoinColumn(name = "factura_id", nullable = false)
     @Schema(description = "Referencia a la factura a la que pertenece este detalle.", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonIgnore // <--- AGREGA ESTO AQUÍ
     private Factura factura;
 
     @Column(name = "es_estadia")

@@ -210,6 +210,10 @@ public class GestorFacturaImp implements GestorFactura {
         detalles.forEach(d -> d.setFactura(facturaGuardada));
         facturaDetalleRepository.saveAll(detalles);
 
+        // . CRUCIAL: Actualizar la lista en memoria antes de retornar
+        facturaGuardada.setDetalles(detalles);
+
+
         // 8. CRUCIAL: Inicializar la colección de detalles (LAZY loading)
         Hibernate.initialize(facturaGuardada.getDetalles());
 
