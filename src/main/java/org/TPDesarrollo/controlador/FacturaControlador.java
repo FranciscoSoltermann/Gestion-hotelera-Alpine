@@ -5,16 +5,20 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.TPDesarrollo.dto.ResumenFacturacionDTO;
 import org.TPDesarrollo.dto.SolicitudFacturaDTO;
+import org.TPDesarrollo.dto.SolicitudNotaCreditoDTO;
 import org.TPDesarrollo.entity.Factura;
+import org.TPDesarrollo.entity.NotaCredito;
 import org.TPDesarrollo.service.GestorFactura;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,4 +78,38 @@ public class FacturaControlador {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Error al facturar: " + e.getMessage()));
         }
     }
+
+    @Operation(
+            summary = "Buscar facturas por cliente (DNI/CUIT)",
+            description = "Devuelve una lista de facturas pendientes/pagadas (no anuladas) asociadas a un documento."
+    )
+    @GetMapping("/buscar-por-cliente")
+    public ResponseEntity<?> buscarFacturasPorCliente(@RequestParam String documento) {
+        try {
+            List<Factura> resultados = gestorFactura.buscarFacturasPorCliente(documento);
+            if (resultados.isEmpty()) {
+                return ResponseEntity.status(404).body(Collections.singletonMap("mensaje", "No se encontraron facturas activas para el documento ingresado."));
+            }
+            return ResponseEntity.ok(resultados);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
+    }
+
+    @Operation(
+            summary = "Generar Nota de Crédito",
+            description = "Anula una o varias facturas seleccionadas y genera el comprobante de nota de crédito."
+    )
+    @PostMapping("/nota-credito")
+    public ResponseEntity<?> crearNotaCredito(@RequestBody @Valid SolicitudNotaCreditoDTO solicitud) {
+        try {
+            NotaCredito nuevaNota = gestorFactura.generarNotaCredito(solicitud);
+            return ResponseEntity.ok(nuevaNota);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Error al generar Nota de Crédito: " + e.getMessage()));
+        }
+    }
+
+
 }

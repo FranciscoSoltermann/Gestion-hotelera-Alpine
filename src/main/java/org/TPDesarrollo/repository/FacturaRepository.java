@@ -21,4 +21,13 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
             @Param("numero") String numero,
             @Param("estado") EstadoFactura estado
     );
+
+
+    @Query("SELECT f FROM Factura f " +
+            "JOIN FETCH f.responsableDePago r " +
+            "WHERE (TREAT(r AS PersonaFisica).dni = :documento " +  // <-- Usamos TREAT para acceder a propiedades de la subclase
+            "    OR TREAT(r AS PersonaJuridica).cuit = :documento) " + // <-- Usamos TREAT aquí también
+            "AND f.estado <> 'ANULADA'")
+    List<Factura> buscarFacturasActivasPorDocumento(@Param("documento") String documento);
+
 }

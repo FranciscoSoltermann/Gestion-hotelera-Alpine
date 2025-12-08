@@ -12,5 +12,10 @@ public enum EstadoFactura {
     /**
      * La factura ha sido liquidada en su totalidad con uno o más pagos.
      */
-    PAGADA
+    PAGADA,
+
+    /**
+     * La factura ha sido cancelada y no se espera ningún pago adicional.
+     */
+    ANULADA
 }
