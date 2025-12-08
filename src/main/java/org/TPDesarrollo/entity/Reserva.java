@@ -29,7 +29,7 @@ public class Reserva {
     private LocalDate egreso;
 
     @ManyToOne
-    @JoinColumn(name = "id_persona", nullable = false) 
+    @JoinColumn(name = "id_persona", nullable = false)
     private Huesped huesped;
 
     @Column(name = "estado")

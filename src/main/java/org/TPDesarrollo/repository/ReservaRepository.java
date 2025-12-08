@@ -9,15 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * Repositorio para la entidad Reserva.
- * Proporciona métodos para realizar operaciones CRUD y consultas personalizadas relacionadas con las reservas.
- */
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
-    // CORREGIDO: Cambiamos 'r.habitacion.id' por 'r.habitacion.idHabitacion'
-    // También agregamos @Param para vincular correctamente los parámetros :nombre
     @Query("SELECT r FROM Reserva r WHERE r.habitacion.idHabitacion = :idHabitacion " +
             "AND r.estado <> 'CANCELADA' " +
             "AND ((r.ingreso BETWEEN :ingreso AND :egreso) " +

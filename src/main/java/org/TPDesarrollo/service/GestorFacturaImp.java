@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,17 +38,22 @@ public class GestorFacturaImp implements GestorFactura {
         Habitacion habitacion = habitacionRepository.findByNumero(numeroHabitacion)
                 .orElseThrow(() -> new RuntimeException("Habitación con número " + numeroHabitacion + " no encontrada."));
 
-        Estadia estadia = estadiaRepository.findEstadiaActivaConDetalles(habitacion.getIdHabitacion())
-                .orElseThrow(() -> new RuntimeException("No hay estadía activa para la habitación " + numeroHabitacion));
+        List<Estadia> resultados = estadiaRepository.findEstadiaActivaConDetalles(habitacion.getIdHabitacion());
+
+        if (resultados.isEmpty()) {
+            throw new RuntimeException("No hay estadía activa...");
+        }
+
+        Estadia estadia = resultados.stream()
+                .max(Comparator.comparing(Estadia::getFechaHoraIngreso))
+                .orElseThrow();
 
         List<ItemFacturableDTO> items = new ArrayList<>();
 
-        // 3. Determinar precio real según el tipo de habitación
         float precioNoche = obtenerPrecioPorHabitacion(estadia.getHabitacion());
 
-        // 4. Calcular días y recargos
         long dias = ChronoUnit.DAYS.between(estadia.getFechaHoraIngreso(), LocalDateTime.of(LocalDate.now(), horaSalida));
-        if (dias == 0) dias = 1; // Cobrar al menos una noche
+        if (dias == 0) dias = 1;
 
         if (horaSalida.isAfter(LocalTime.of(11, 0))) {
             if (horaSalida.isBefore(LocalTime.of(18, 0))) {
@@ -63,8 +70,7 @@ public class GestorFacturaImp implements GestorFactura {
             }
         }
 
-        // Agregar el costo base de la estadía
-        items.add(0, ItemFacturableDTO.builder()
+        items.addFirst(ItemFacturableDTO.builder()
                 .descripcion("Estadía Habitación " + numeroHabitacion + " (" + estadia.getHabitacion().getClass().getSimpleName() + ")")
                 .medida("NOCHES")
                 .cantidad((int) dias)
@@ -73,7 +79,6 @@ public class GestorFacturaImp implements GestorFactura {
                 .esEstadia(true)
                 .build());
 
-        // 5. Cargar consumos
         if (estadia.getItemsConsumo() != null) {
             for (Consumo consumo : estadia.getItemsConsumo()) {
 
@@ -93,10 +98,8 @@ public class GestorFacturaImp implements GestorFactura {
 
         double total = items.stream().mapToDouble(ItemFacturableDTO::getSubtotal).sum();
 
-        /* 6. Obtener Posibles Responsables de Pago (SIMPLIFICADO) */
         List<ResponsableDePagoDTO> posiblesResponsables = new ArrayList<>();
 
-        // Usamos la Reserva referenciada directamente por la Estadia (que fue el objeto de la corrección inicial)
         if (estadia.getReserva() != null && estadia.getReserva().getHuesped() != null) {
             Huesped titular = estadia.getReserva().getHuesped();
 
@@ -108,7 +111,6 @@ public class GestorFacturaImp implements GestorFactura {
                     .build());
         }
 
-        // 7. Retornar DTO final
         return ResumenFacturacionDTO.builder()
                 .idEstadia((long) estadia.getIdestadia())
                 .numeroHabitacion(numeroHabitacion)
@@ -125,8 +127,43 @@ public class GestorFacturaImp implements GestorFactura {
         Estadia estadia = estadiaRepository.findById(solicitud.getIdEstadia().intValue())
                 .orElseThrow(() -> new RuntimeException("Estadía no encontrada"));
 
-        ResponsableDePago responsable = responsableRepository.findById(solicitud.getIdResponsablePagoSeleccionado())
-                .orElseThrow(() -> new RuntimeException("Responsable no encontrado"));
+        ResponsableDePago responsable;
+
+        if (solicitud.getCuitTercero() != null && !solicitud.getCuitTercero().isBlank()) {
+            String cuit = solicitud.getCuitTercero().trim();
+            Optional<ResponsableDePago> existente = responsableRepository.buscarPorDocumento(cuit);
+
+            if (existente.isPresent()) {
+                responsable = existente.get();
+            } else {
+                PersonaJuridica nuevaEmpresa = PersonaJuridica.builder()
+                        .razonSocial(solicitud.getRazonSocialTercero())
+                        .cuit(cuit)
+                        .build();
+                responsable = responsableRepository.save(nuevaEmpresa);
+            }
+        }
+        else {
+            Integer idHuesped = solicitud.getIdResponsablePagoSeleccionado();
+
+            Huesped huesped = huespedRepository.findById(idHuesped)
+                    .orElseThrow(() -> new RuntimeException("El huésped seleccionado no existe."));
+
+            Optional<ResponsableDePago> responsableExistente = responsableRepository.buscarPorDocumento(huesped.getDocumento());
+
+            if (responsableExistente.isPresent()) {
+                responsable = responsableExistente.get();
+            } else {
+                PersonaFisica nuevoResponsable = PersonaFisica.builder()
+                        .nombre(huesped.getNombre())
+                        .apellido(huesped.getApellido())
+                        .dni(huesped.getDocumento())
+                        .direccion(huesped.getDireccion())
+                        .build();
+
+                responsable = responsableRepository.save(nuevoResponsable);
+            }
+        }
 
         Factura factura = Factura.builder()
                 .estado(EstadoFactura.PENDIENTE)

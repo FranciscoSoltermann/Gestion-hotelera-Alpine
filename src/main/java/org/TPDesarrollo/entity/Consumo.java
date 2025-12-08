@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -35,6 +36,7 @@ public class Consumo {
 
     @ManyToOne
     @JoinColumn(name = "id_estadia")
+    @JsonIgnore
     private Estadia estadia;
 
     public Float getMontoTotal() {

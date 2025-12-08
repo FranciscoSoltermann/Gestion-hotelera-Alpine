@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "ocupante", schema = "pruebabdd")
@@ -19,6 +20,7 @@ public class Ocupante extends Persona {
 
     @ManyToOne
     @JoinColumn(name = "id_reserva")
+    @JsonIgnore
     private Reserva reserva;
 
     @ManyToOne

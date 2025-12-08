@@ -7,6 +7,8 @@ import org.TPDesarrollo.entity.Factura;
 import java.time.LocalTime;
 
 public interface GestorFactura {
+
     ResumenFacturacionDTO buscarEstadiaParaFacturar(String numeroHabitacion, LocalTime horaSalida);
+
     Factura generarFactura(SolicitudFacturaDTO solicitud);
 }

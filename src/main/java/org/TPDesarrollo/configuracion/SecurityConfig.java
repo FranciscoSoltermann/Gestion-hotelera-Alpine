@@ -22,17 +22,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Desactivamos CSRF (necesario para que funcionen los POST desde Postman/React en este tipo de API)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
@@ -43,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/facturas/**").permitAll()
                         .requestMatchers("/api/responsables/**").permitAll()
                         .requestMatchers("/api/consumos/**").permitAll()
+                        .requestMatchers("/api/pagos/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

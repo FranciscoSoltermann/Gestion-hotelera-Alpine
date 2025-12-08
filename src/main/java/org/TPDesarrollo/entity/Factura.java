@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,6 +52,9 @@ public class Factura {
     private ResponsableDePago responsableDePago;
 
     @ManyToOne
-    @JoinColumn(name = "estadia", nullable = false)
+    @JoinColumn(name = "id_estadia", nullable = false)
     private Estadia estadia;
+
+    @Transient
+    private Double saldoPendiente;
 }
