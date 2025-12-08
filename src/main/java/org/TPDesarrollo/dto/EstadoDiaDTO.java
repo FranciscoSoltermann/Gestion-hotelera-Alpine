@@ -1,5 +1,9 @@
 package org.TPDesarrollo.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data; // Importamos Lombok Data
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
 
@@ -9,18 +13,17 @@ import java.time.LocalDate;
  * Utilizado para transferir datos entre capas de la aplicación.
  */
 
+@Data // Genera getters, setters, equals, hashCode y toString
+@NoArgsConstructor
+@AllArgsConstructor // Genera el constructor con todos los argumentos
+@Schema(description = "Representa el estado de una habitación en una fecha específica.")
 public class EstadoDiaDTO {
+
+    @Schema(description = "Fecha específica del estado (Formato ISO: YYYY-MM-DD)", example = "2025-05-20")
     private LocalDate fecha;
+
+    @Schema(description = "Estado de la habitación en esa fecha", example = "DISPONIBLE")
     private EstadoHabitacion estado;
 
-    public EstadoDiaDTO(LocalDate fecha, EstadoHabitacion estado) {
-        this.fecha = fecha;
-        this.estado = estado;
-    }
 
-    // Getters y Setters
-    public LocalDate getFecha() { return fecha; }
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
-    public EstadoHabitacion getEstado() { return estado; }
-    public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
 }

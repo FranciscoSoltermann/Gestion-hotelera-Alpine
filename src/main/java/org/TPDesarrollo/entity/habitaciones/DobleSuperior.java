@@ -1,5 +1,6 @@
 package org.TPDesarrollo.entity.habitaciones;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.TPDesarrollo.entity.Habitacion;
@@ -13,5 +14,6 @@ import org.TPDesarrollo.entity.Habitacion;
  */
 @Entity
 @Table(name = "doble_superior", schema = "pruebabdd")
+@Schema(description = "Entidad que representa una Habitación de tipo Doble Superior. Hereda todos los atributos y lógica de la clase base Habitacion.")
 public class DobleSuperior extends Habitacion {
 }

@@ -1,16 +1,27 @@
 package org.TPDesarrollo.enums;
 
 /**
- * Enum que representa los posibles estados de una habitación.
- * Los estados incluyen:
- * - DISPONIBLE: La habitación está libre para ser reservada o ocupada.
- * - OCUPADA: La habitación está actualmente ocupada por un huésped.
- * - RESERVADA: La habitación ha sido reservada pero aún no está ocupada.
- * - MANTENIMIENTO: La habitación está fuera de servicio por mantenimiento o reparaciones.
+ * Define los posibles estados de una habitación dentro del sistema de gestión hotelera.
  */
 public enum EstadoHabitacion {
+    /**
+     * La habitación está libre, limpia y lista para ser reservada o asignada inmediatamente (Check-in).
+     */
     DISPONIBLE,
+
+    /**
+     * La habitación está actualmente ocupada por uno o más huéspedes (Check-out aún no realizado).
+     */
     OCUPADA,
+
+    /**
+     * La habitación tiene una reserva confirmada para una fecha futura, pero aún no está ocupada.
+     */
     RESERVADA,
+
+    /**
+     * La habitación está fuera de servicio temporalmente por tareas de limpieza profunda,
+     * reparaciones o mantenimiento, y no puede ser reservada ni ocupada.
+     */
     MANTENIMIENTO
 }

@@ -9,7 +9,7 @@ import org.TPDesarrollo.enums.TipoFactura;
 import org.TPDesarrollo.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.hibernate.Hibernate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -124,11 +124,13 @@ public class GestorFacturaImp implements GestorFactura {
     @Override
     @Transactional
     public Factura generarFactura(SolicitudFacturaDTO solicitud) {
+        // 1. Obtener Estadia
         Estadia estadia = estadiaRepository.findById(solicitud.getIdEstadia().intValue())
                 .orElseThrow(() -> new RuntimeException("Estadía no encontrada"));
 
         ResponsableDePago responsable;
 
+        // 2. Determinar o Crear Responsable de Pago (Lógica de PersonaFisica/Juridica)
         if (solicitud.getCuitTercero() != null && !solicitud.getCuitTercero().isBlank()) {
             String cuit = solicitud.getCuitTercero().trim();
             Optional<ResponsableDePago> existente = responsableRepository.buscarPorDocumento(cuit);
@@ -142,10 +144,8 @@ public class GestorFacturaImp implements GestorFactura {
                         .build();
                 responsable = responsableRepository.save(nuevaEmpresa);
             }
-        }
-        else {
+        } else {
             Integer idHuesped = solicitud.getIdResponsablePagoSeleccionado();
-
             Huesped huesped = huespedRepository.findById(idHuesped)
                     .orElseThrow(() -> new RuntimeException("El huésped seleccionado no existe."));
 
@@ -160,11 +160,11 @@ public class GestorFacturaImp implements GestorFactura {
                         .dni(huesped.getDocumento())
                         .direccion(huesped.getDireccion())
                         .build();
-
                 responsable = responsableRepository.save(nuevoResponsable);
             }
         }
 
+        // 3. Construir la Factura inicial
         Factura factura = Factura.builder()
                 .estado(EstadoFactura.PENDIENTE)
                 .fechaEmision(LocalDate.now())
@@ -177,8 +177,8 @@ public class GestorFacturaImp implements GestorFactura {
         float totalEstadia = 0f;
         List<FacturaDetalle> detalles = new ArrayList<>();
 
+        // 4. Crear Detalles y calcular totales
         for (ItemFacturableDTO item : solicitud.getItemsAFacturar()) {
-
             float subtotalReal = item.getPrecioUnitario() * item.getCantidad();
 
             FacturaDetalle detalle = FacturaDetalle.builder()
@@ -188,10 +188,10 @@ public class GestorFacturaImp implements GestorFactura {
                     .cantidad(item.getCantidad())
                     .precioUnitario(item.getPrecioUnitario())
                     .subtotal(subtotalReal)
+                    .esEstadia(item.isEsEstadia()) // <-- AÑADIR ESTA LÍNEA CLAVE
                     .build();
 
             detalles.add(detalle);
-
             totalFactura += subtotalReal;
 
             if (item.isEsEstadia()) {
@@ -199,17 +199,35 @@ public class GestorFacturaImp implements GestorFactura {
             }
         }
 
+        // 5. Asignar Totales a la Factura
         factura.setMontoTotal(totalFactura);
         factura.setValorEstadia(totalEstadia);
 
+        // 6. Guardar Factura Principal
         Factura facturaGuardada = facturaRepository.save(factura);
 
+        // 7. Asociar Factura guardada a Detalles y guardar Detalles
         detalles.forEach(d -> d.setFactura(facturaGuardada));
         facturaDetalleRepository.saveAll(detalles);
 
+        // 8. CRUCIAL: Inicializar la colección de detalles (LAZY loading)
+        Hibernate.initialize(facturaGuardada.getDetalles());
+
+        // 9. Rellenar campos Transitorios del Responsable de Pago (Para el Frontend)
+        if (responsable instanceof PersonaFisica pf) {
+            // Asumiendo que Factura.java tiene setResponsableNombre y setResponsableDoc (transitorios)
+            facturaGuardada.setResponsableNombre(pf.getApellido() + " " + pf.getNombre());
+            facturaGuardada.setResponsableDoc(pf.getDni()); // o CUIT, según la configuración de tu entidad
+        } else if (responsable instanceof PersonaJuridica pj) {
+            facturaGuardada.setResponsableNombre(pj.getRazonSocial());
+            facturaGuardada.setResponsableDoc(pj.getCuit());
+        }
+
+        // 10. Actualizar Estadia (Fecha Egreso)
         estadia.setFechaHoraEgreso(LocalDateTime.of(LocalDate.now(), solicitud.getHoraSalida()));
         estadiaRepository.save(estadia);
 
+        // 11. Retornar la Factura completa y serializable
         return facturaGuardada;
     }
 
