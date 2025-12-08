@@ -54,24 +54,21 @@ public class GestorReservaImp implements GestorReserva {
         reservaRepository.delete(reserva);
     }
 
-    // --- LÓGICA CLAVE PARA QUE FUNCIONE EL BOTÓN ELIMINAR DESDE LA GRILLA ---
+    // --- LÓGICA CORREGIDA PARA ELIMINAR DESDE LA GRILLA ---
     @Override
     @Transactional
     public void cancelarReservaPorFecha(Integer idHabitacion, LocalDate fecha) throws Exception {
-        // Buscamos reservas en esa habitación para esa fecha exacta
-        List<Reserva> reservas = reservaRepository.encontrarSolapamientos(idHabitacion, fecha, fecha);
 
-        if (reservas.isEmpty()) {
-            throw new RuntimeException("No hay reservas para la habitación en la fecha " + fecha);
-        }
+        // CORRECCIÓN CRÍTICA: Usamos 'buscarReservaActivaEnFecha' en lugar de 'encontrarSolapamientos'.
+        // 'encontrarSolapamientos' usa lógica estricta (< y >) para evitar choques, por lo que fallaba
+        // al buscar una reserva que empieza exactamente en la fecha 'fecha'.
+        // 'buscarReservaActivaEnFecha' usa lógica inclusiva (<=) para encontrarla correctamente.
 
-        // Filtramos la primera que sea 'RESERVADA' (Amarilla)
-        Reserva aEliminar = reservas.stream()
-                .filter(r -> "RESERVADA".equalsIgnoreCase(r.getEstado()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("La habitación está ocupada o no tiene reservas pendientes para borrar."));
+        Reserva reservaAEliminar = reservaRepository.buscarReservaActivaEnFecha(idHabitacion, fecha)
+                .orElseThrow(() -> new RuntimeException("No se encontró ninguna reserva PENDIENTE para borrar en esa fecha."));
 
-        reservaRepository.delete(aEliminar);
+        // La query del repositorio ya filtra que el estado sea 'RESERVADA', así que borramos directo.
+        reservaRepository.delete(reservaAEliminar);
     }
 
     private List<Reserva> procesarReserva(ReservaDTO dto, String estadoNuevo) {
@@ -87,6 +84,7 @@ public class GestorReservaImp implements GestorReserva {
         List<Reserva> reservasGuardadas = new ArrayList<>();
 
         for (Habitacion h : habitaciones) {
+            // Usamos la query ESTRICTA para validar cruces al crear (permite check-out y check-in el mismo día)
             List<Reserva> conflictos = reservaRepository.encontrarSolapamientos(
                     h.getIdHabitacion(), dto.getIngreso(), dto.getEgreso()
             );
