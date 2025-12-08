@@ -14,4 +14,10 @@ public interface ResponsableDePagoRepository extends JpaRepository<ResponsableDe
 
     @Query("SELECT p FROM PersonaJuridica p WHERE p.cuit = :cuit")
     Optional<PersonaJuridica> findByCuit(@Param("cuit") String cuit);
+
+    @Query("SELECT r FROM ResponsableDePago r " +
+            "WHERE TREAT(r AS PersonaJuridica).cuit = :documento " +
+            "OR TREAT(r AS PersonaFisica).cuit = :documento " +
+            "OR TREAT(r AS PersonaFisica).dni = :documento")
+    Optional<ResponsableDePago> buscarPorDocumento(@Param("documento") String documento);
 }

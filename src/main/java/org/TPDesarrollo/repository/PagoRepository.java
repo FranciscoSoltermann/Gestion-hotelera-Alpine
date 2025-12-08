@@ -1,0 +1,12 @@
+package org.TPDesarrollo.repository;
+
+import org.TPDesarrollo.entity.Factura;
+import org.TPDesarrollo.entity.Pago;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface PagoRepository extends JpaRepository<Pago, Integer> {
+
+    List<Pago> findByFactura(Factura factura);
+}

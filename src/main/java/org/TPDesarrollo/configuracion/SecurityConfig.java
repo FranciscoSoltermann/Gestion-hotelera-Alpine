@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/facturas/**").permitAll()
                         .requestMatchers("/api/responsables/**").permitAll()
                         .requestMatchers("/api/consumos/**").permitAll()
+                        .requestMatchers("/api/pagos/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,8 +64,7 @@ public class GestorFacturaImp implements GestorFactura {
             }
         }
 
-        // Agregar el costo base de la estadía
-        items.add(0, ItemFacturableDTO.builder()
+        items.addFirst(ItemFacturableDTO.builder()
                 .descripcion("Estadía Habitación " + numeroHabitacion + " (" + estadia.getHabitacion().getClass().getSimpleName() + ")")
                 .medida("NOCHES")
                 .cantidad((int) dias)
@@ -120,13 +120,32 @@ public class GestorFacturaImp implements GestorFactura {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Factura generarFactura(SolicitudFacturaDTO solicitud) {
         Estadia estadia = estadiaRepository.findById(solicitud.getIdEstadia().intValue())
                 .orElseThrow(() -> new RuntimeException("Estadía no encontrada"));
 
-        ResponsableDePago responsable = responsableRepository.findById(solicitud.getIdResponsablePagoSeleccionado())
-                .orElseThrow(() -> new RuntimeException("Responsable no encontrado"));
+        ResponsableDePago responsable;
+
+        if (solicitud.getCuitTercero() != null && !solicitud.getCuitTercero().isBlank()) {
+            String cuit = solicitud.getCuitTercero().trim();
+
+            Optional<ResponsableDePago> existente = responsableRepository.buscarPorDocumento(cuit);
+
+            if (existente.isPresent()) {
+                responsable = existente.get();
+            } else {
+                PersonaJuridica nuevaEmpresa = PersonaJuridica.builder()
+                        .razonSocial(solicitud.getRazonSocialTercero())
+                        .cuit(cuit)
+                        .build();
+
+                responsable = responsableRepository.save(nuevaEmpresa);
+            }
+        } else {
+            responsable = responsableRepository.findById(solicitud.getIdResponsablePagoSeleccionado())
+                    .orElseThrow(() -> new RuntimeException("Responsable no encontrado en la base de datos."));
+        }
 
         Factura factura = Factura.builder()
                 .estado(EstadoFactura.PENDIENTE)
