@@ -10,30 +10,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/**
- * Configuración de seguridad para la aplicación.
- * Define las reglas de acceso y los mecanismos de autenticación.
- * Utiliza Spring Security para gestionar la seguridad de las rutas de la API.
- * Permite el acceso libre a las rutas de usuario, huésped, reserva y habitación,
- * mientras que protege cualquier otra ruta que requiera autenticación.
- * También configura un codificador de contraseñas utilizando BCrypt.
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * Configura el codificador de contraseñas utilizando BCrypt.
-     * @return Una instancia de PasswordEncoder que utiliza BCrypt para el hashing de contraseñas.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     /**
-     * Configura la cadena de filtros de seguridad para la aplicación.
-     * @return La configuración de SecurityFilterChain que define las reglas de seguridad.
+     * Configura la cadena de filtros de seguridad.
+     * Se añaden todas las rutas comunes de Swagger/OpenAPI para resolver el error 403.
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +29,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v2/api-docs",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // Permite acceso libre a las rutas de la API de tu proyecto
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/huespedes/**").permitAll()
                         .requestMatchers("/api/reservas/**").permitAll()
@@ -49,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/responsables/**").permitAll()
                         .requestMatchers("/api/consumos/**").permitAll()
                         .requestMatchers("/api/pagos/**").permitAll()
+
+                        // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
                 );
 
