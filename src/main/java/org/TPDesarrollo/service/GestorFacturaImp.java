@@ -30,6 +30,7 @@ public class GestorFacturaImp implements GestorFactura {
     private final ReservaRepository reservaRepository;
     private final HuespedRepository huespedRepository;
     private final HabitacionRepository habitacionRepository;
+    private final NotaCreditoRepository notaCreditoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -249,4 +250,59 @@ public class GestorFacturaImp implements GestorFactura {
         }
         return 0.0f;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Factura> buscarFacturasPorCliente(String documento) {
+        // Implementa paso 4 del CU: Buscar por DNI/CUIT y que NO estén anuladas
+        return facturaRepository.buscarFacturasActivasPorDocumento(documento);
+    }
+
+    @Override
+    @Transactional
+    public NotaCredito generarNotaCredito(SolicitudNotaCreditoDTO solicitud) {
+        // 1. Validar que la lista no venga vacía
+        if (solicitud.getIdsFacturas() == null || solicitud.getIdsFacturas().isEmpty()) {
+            throw new RuntimeException("No se seleccionaron facturas para anular.");
+        }
+
+        // 2. Buscar todas las facturas
+        List<Factura> facturas = facturaRepository.findAllById(solicitud.getIdsFacturas());
+
+        if (facturas.isEmpty()) {
+            throw new RuntimeException("No se encontraron facturas con los IDs proporcionados.");
+        }
+
+        double sumaTotal = 0.0;
+
+        // 3. Procesar cada factura
+        for (Factura f : facturas) {
+            // Validación: No anular lo ya anulado
+            if (f.getEstado() == EstadoFactura.ANULADA) {
+                throw new RuntimeException("La factura " + f.getId() + " ya se encuentra ANULADA.");
+            }
+
+            // Acumular monto (tu entidad Factura usa float, NotaCredito usa Double)
+            sumaTotal += f.getMontoTotal();
+
+            // Cambio de estado (Paso 9 CU)
+            f.setEstado(EstadoFactura.ANULADA);
+
+            // NOTA: Al pasar a ANULADA, el método 'buscarEstadiaParaFacturar'
+            // volverá a encontrar la estadía disponible para facturar de nuevo,
+            // cumpliendo con "dejar la deuda asociada como pendiente".
+        }
+
+        // 4. Crear Nota de Crédito
+        NotaCredito nc = NotaCredito.builder()
+                .fechaEmision(LocalDate.now())
+                .montoTotal(sumaTotal)
+                .facturasCanceladas(facturas) // Relacionamos las facturas
+                .build();
+
+        // 5. Guardar (Cascade actualizará las facturas también)
+        return notaCreditoRepository.save(nc);
+    }
+
+
 }
