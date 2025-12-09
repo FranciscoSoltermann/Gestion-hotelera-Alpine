@@ -1,15 +1,23 @@
 package org.TPDesarrollo.controlador;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.TPDesarrollo.clases.Usuario;
-import org.TPDesarrollo.dtos.UsuarioDTO;
+import org.TPDesarrollo.entity.Usuario;
+import org.TPDesarrollo.dto.UsuarioDTO;
 import org.TPDesarrollo.exceptions.ContraseniaInvalida;
 import org.TPDesarrollo.exceptions.UsuarioNoEncontrado;
-import org.TPDesarrollo.gestores.GestorUsuario;
+import org.TPDesarrollo.service.GestorUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 
 /**
  * Controlador REST para la gestión de usuarios.
@@ -19,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/usuarios")
+@Tag(name = "Usuarios y Autenticación", description = "Endpoints para el inicio de sesión y el registro de nuevos usuarios del sistema.")
 public class UsuarioControlador {
 
     private final GestorUsuario gestorUsuario;
@@ -28,6 +37,14 @@ public class UsuarioControlador {
         this.gestorUsuario = gestorUsuario;
     }
 
+    @Operation(summary = "Inicio de Sesión", description = "Autentica un usuario con nombre y contraseña. Devuelve el objeto Usuario si las credenciales son válidas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Inicio de sesión exitoso. Retorna el objeto Usuario logueado."),
+            @ApiResponse(responseCode = "404", description = "Error: Nombre de usuario no encontrado.",
+                    content = @Content(schema = @Schema(implementation = String.class))), // Asumimos que la excepción la captura el GlobalExceptionHandler y devuelve JSON
+            @ApiResponse(responseCode = "401", description = "Error: Contraseña inválida.",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UsuarioDTO datos) throws UsuarioNoEncontrado, ContraseniaInvalida {
 
@@ -39,6 +56,11 @@ public class UsuarioControlador {
         return ResponseEntity.ok(usuarioLogueado);
     }
 
+    @Operation(summary = "Registro de nuevo Usuario", description = "Crea una nueva cuenta de usuario en el sistema. Requiere validación de contraseña y campos.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuario registrado exitosamente. Retorna el nuevo objeto Usuario."),
+            @ApiResponse(responseCode = "400", description = "Datos de registro inválidos (ej: nombre de usuario ya existe, contraseña no cumple requisitos).")
+    })
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@Valid @RequestBody UsuarioDTO datos) {
         Usuario usuarioNuevo = gestorUsuario.registrarUsuario(datos);

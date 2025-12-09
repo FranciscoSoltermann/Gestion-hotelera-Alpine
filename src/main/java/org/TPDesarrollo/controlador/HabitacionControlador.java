@@ -1,7 +1,12 @@
 package org.TPDesarrollo.controlador;
 
-import org.TPDesarrollo.dtos.GrillaHabitacionDTO;
-import org.TPDesarrollo.gestores.GestorHabitacion;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.TPDesarrollo.dto.GrillaHabitacionDTO;
+import org.TPDesarrollo.service.GestorHabitacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +20,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/habitaciones")
-// Ajusta el puerto según donde corra el React/Frontend
 @CrossOrigin(origins = "http://localhost:3000")
+@Tag(name = "Habitaciones & Disponibilidad", description = "Consulta y gestión del estado de ocupación y reservas de las habitaciones.")
 public class HabitacionControlador {
 
     private final GestorHabitacion gestorHabitacion;
@@ -26,20 +31,31 @@ public class HabitacionControlador {
         this.gestorHabitacion = gestorHabitacion;
     }
 
-    // Endpoint para obtener el estado de las habitaciones en un rango de fechas
+    @Operation(
+            summary = "Obtener Matriz de Disponibilidad",
+            description = "Devuelve el estado (Disponible, Ocupada, Reservada, Mantenimiento) de todas las habitaciones para un rango de fechas. Utilizado para la grilla de recepción."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Listado de la disponibilidad por día generado correctamente."),
+            @ApiResponse(responseCode = "400", description = "Error en la validación de fechas (ej: rango inválido)."),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor al consultar la base de datos.")
+    })
     @GetMapping("/estado")
     public ResponseEntity<?> obtenerEstado(
+            @Parameter(description = "Fecha de inicio del rango (Formato ISO: YYYY-MM-DD)", example = "2025-01-01")
             @RequestParam("desde") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
+
+            @Parameter(description = "Fecha de fin del rango (Formato ISO: YYYY-MM-DD)", example = "2025-01-15")
             @RequestParam("hasta") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta) {
 
         try {
-            // Llama al gestor siguiendo el diagrama de secuencia
             List<GrillaHabitacionDTO> resultado = gestorHabitacion.obtenerEstadoHabitaciones(fechaDesde, fechaHasta);
             return ResponseEntity.ok(resultado);
         } catch (IllegalArgumentException e) {
-            // Manejo de errores de validación de fechas
+            // Manejo de errores de validación de fechas (devuelve 400 Bad Request)
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
+            // Manejo de errores generales (devuelve 500 Internal Server Error)
             return ResponseEntity.internalServerError().body("Error al obtener estados");
         }
     }

@@ -1,6 +1,6 @@
 package org.TPDesarrollo.repository;
 
-import org.TPDesarrollo.clases.Reserva;
+import org.TPDesarrollo.entity.Reserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,22 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Repositorio para la entidad Reserva.
- * Proporciona métodos para realizar operaciones CRUD y consultas personalizadas relacionadas con las reservas.
- */
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
-
-    // Para el GestorReserva (validar solapamientos)
-    // Buscar reservas que se solapen con un rango de fechas dado para una habitación específica
-    @Query("""
-        SELECT r FROM Reserva r
-        WHERE r.habitacion.id = :idHabitacion
-        AND (r.ingreso < :egreso AND r.egreso > :ingreso)
-    """)
+    // ESTRICTA: Para evitar solapamientos al crear (la que arreglamos antes)
+    @Query("SELECT r FROM Reserva r WHERE r.habitacion.idHabitacion = :idHabitacion " +
+            "AND r.estado <> 'CANCELADA' " +
+            "AND (r.ingreso < :egreso AND r.egreso > :ingreso)")
     List<Reserva> encontrarSolapamientos(
             @Param("idHabitacion") Integer idHabitacion,
             @Param("ingreso") LocalDate ingreso,
@@ -32,4 +25,16 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     @Query("SELECT r FROM Reserva r WHERE r.ingreso < :hasta AND r.egreso > :desde")
     List<Reserva> encontrarReservasEnRango(@Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    // --- NUEVO MÉTODO PARA ELIMINAR ---
+    // Esta query es INCLUSIVA (<=). Busca una reserva que esté activa en la fecha específica que clickeaste.
+    // Sirve para encontrar la reserva del día 12 aunque empiece el 12.
+    @Query("SELECT r FROM Reserva r " +
+            "WHERE r.habitacion.idHabitacion = :idHabitacion " +
+            "AND r.estado = 'RESERVADA' " +
+            "AND (r.ingreso <= :fecha AND r.egreso > :fecha)")
+    Optional<Reserva> buscarReservaActivaEnFecha(
+            @Param("idHabitacion") Integer idHabitacion,
+            @Param("fecha") LocalDate fecha
+    );
 }

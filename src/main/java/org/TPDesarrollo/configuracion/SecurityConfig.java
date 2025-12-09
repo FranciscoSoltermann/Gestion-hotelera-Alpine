@@ -2,6 +2,7 @@ package org.TPDesarrollo.configuracion;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,26 +22,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Desactivamos CSRF (necesario para que funcionen los POST desde Postman/React en este tipo de API)
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // Configuramos las reglas de las URL
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        // Permitimos entrar a TODOS a las rutas de usuario (login, registrar)
                         .requestMatchers("/api/usuarios/**").permitAll()
                         .requestMatchers("/api/huespedes/**").permitAll()
                         .requestMatchers("/api/reservas/**").permitAll()
                         .requestMatchers("/api/habitaciones/**").permitAll()
+                        .requestMatchers("/api/facturas/**").permitAll()
+                        .requestMatchers("/api/responsables/**").permitAll()
+                        .requestMatchers("/api/consumos/**").permitAll()
+                        .requestMatchers("/api/pagos/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
