@@ -54,7 +54,6 @@ public class Factura {
 
     @ManyToOne
     @JoinColumn(name = "id_responsable_de_pago", nullable = false)
-    @JsonIgnore
     @Schema(description = "Referencia al Huésped o Empresa responsable de liquidar la factura.", requiredMode = Schema.RequiredMode.REQUIRED)
     private ResponsableDePago responsableDePago;
     @Transient
