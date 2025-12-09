@@ -7,7 +7,9 @@ import org.TPDesarrollo.enums.EstadoHabitacion;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Entidad que registra la intención de un huésped de ocupar una habitación en un período futuro (o actual).
+ */
 @Entity
 @Table(name = "reserva", schema = "pruebabdd")
 @Data

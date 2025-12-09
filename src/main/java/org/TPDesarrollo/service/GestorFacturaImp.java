@@ -18,7 +18,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Implementación del servicio GestorFactura.
+ * Proporciona funcionalidades para la gestión de facturación,
+ * incluyendo la generación de facturas y notas de crédito.
+ */
 @Service
 @RequiredArgsConstructor
 public class GestorFacturaImp implements GestorFactura {
@@ -31,7 +35,13 @@ public class GestorFacturaImp implements GestorFactura {
     private final HuespedRepository huespedRepository;
     private final HabitacionRepository habitacionRepository;
     private final NotaCreditoRepository notaCreditoRepository;
-
+    /**
+     * Busca una estadía activa para facturar basada en el número de habitación y la hora de salida.
+     *
+     * @param numeroHabitacion Número de la habitación.
+     * @param horaSalida       Hora de salida para calcular cargos adicionales.
+     * @return ResumenFacturacionDTO con los detalles de la facturación.
+     */
     @Override
     @Transactional(readOnly = true)
     public ResumenFacturacionDTO buscarEstadiaParaFacturar(String numeroHabitacion, LocalTime horaSalida) {
@@ -121,7 +131,12 @@ public class GestorFacturaImp implements GestorFactura {
                 .tipoFacturaSugerido(TipoFactura.B)
                 .build();
     }
-
+    /**
+     * Genera una factura basada en la solicitud proporcionada.
+     *
+     * @param solicitud Detalles necesarios para generar la factura.
+     * @return Factura generada con todos los detalles asociados.
+     */
     @Override
     @Transactional
     public Factura generarFactura(SolicitudFacturaDTO solicitud) {
@@ -235,7 +250,12 @@ public class GestorFacturaImp implements GestorFactura {
         // 11. Retornar la Factura completa y serializable
         return facturaGuardada;
     }
-
+    /**
+     * Obtiene el precio por noche según el tipo de habitación.
+     *
+     * @param habitacion La habitación para la cual se desea obtener el precio.
+     * @return Precio por noche de la habitación.
+     */
     private float obtenerPrecioPorHabitacion(Habitacion habitacion) {
         if (habitacion instanceof IndividualEstandar) {
             return 50_800.0f;
@@ -250,14 +270,24 @@ public class GestorFacturaImp implements GestorFactura {
         }
         return 0.0f;
     }
-
+    /**
+     * Busca facturas activas (no anuladas) por el documento del cliente.
+     *
+     * @param documento Documento del cliente (DNI o CUIT).
+     * @return Lista de facturas activas asociadas al cliente.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Factura> buscarFacturasPorCliente(String documento) {
         // Implementa paso 4 del CU: Buscar por DNI/CUIT y que NO estén anuladas
         return facturaRepository.buscarFacturasActivasPorDocumento(documento);
     }
-
+    /**
+     * Genera una nota de crédito para anular facturas seleccionadas.
+     *
+     * @param solicitud Detalles necesarios para generar la nota de crédito.
+     * @return Nota de crédito generada con las facturas anuladas.
+     */
     @Override
     @Transactional
     public NotaCredito generarNotaCredito(SolicitudNotaCreditoDTO solicitud) {

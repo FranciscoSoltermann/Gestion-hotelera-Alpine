@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.TPDesarrollo.enums.RedDePago;
-
+/**
+ * Entidad que representa un pago realizado mediante tarjeta de crédito.
+ * Hereda campos comunes de MedioDePago.
+ */
 @Entity
 @Table(name = "credito", schema = "pruebabdd")
 @Data

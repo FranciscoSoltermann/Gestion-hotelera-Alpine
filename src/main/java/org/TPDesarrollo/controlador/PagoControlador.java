@@ -15,7 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import org.TPDesarrollo.enums.EstadoFactura;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * Controlador REST para la gestión de pagos asociados a facturas.
+ * Proporciona endpoints para buscar facturas pendientes de pago y registrar pagos.
+ * Utiliza GestorPagoImp para la lógica de negocio.
+ * Maneja excepciones para proporcionar respuestas adecuadas en caso de errores.
+ */
 @RestController
 @RequestMapping("/api/pagos")
 @RequiredArgsConstructor
@@ -24,7 +29,11 @@ public class PagoControlador {
 
     private final GestorPagoImp gestorPago;
     private final FacturaRepository facturaRepository; // (Aunque no se usa en los métodos, se deja por si la lógica lo requiere en el futuro)
-
+    /**
+     * Endpoint para buscar facturas pendientes de pago por habitación.
+     * @param habitacion Número de la habitación para buscar facturas.
+     * @return Respuesta HTTP con la lista de facturas pendientes o error en la operación.
+     */
     @Operation(
             summary = "Buscar facturas pendientes de pago",
             description = "Obtiene todas las facturas abiertas o con saldo pendiente asociadas a la estadía activa de una habitación específica."
@@ -34,6 +43,11 @@ public class PagoControlador {
             @ApiResponse(responseCode = "404", description = "No se encontraron facturas pendientes para esa habitación."),
             @ApiResponse(responseCode = "400", description = "Error en el formato de la habitación solicitada.")
     })
+    /**
+     * Maneja la solicitud GET para buscar facturas pendientes.
+     * @param habitacion Número de la habitación para buscar facturas.
+     * @return ResponseEntity con la lista de facturas pendientes o error.
+     */
     @GetMapping("/pendientes")
     public ResponseEntity<?> buscarPendientes(
             @Parameter(description = "Número de habitación para buscar facturas", example = "105")
@@ -46,7 +60,11 @@ public class PagoControlador {
         }
         return ResponseEntity.ok(pendientes);
     }
-
+    /**
+     * Endpoint para registrar un pago a una factura específica.
+     * @param pagoDTO Datos del pago a registrar (facturaId, monto).
+     * @return Respuesta HTTP con la factura actualizada o error en la operación.
+     */
     @Operation(
             summary = "Registrar un pago",
             description = "Aplica un monto de pago a una factura específica, actualizando su saldo y estado (de 'PENDIENTE' a 'PAGADA' si el saldo es cero)."
@@ -55,6 +73,10 @@ public class PagoControlador {
             @ApiResponse(responseCode = "200", description = "Pago registrado y factura actualizada exitosamente."),
             @ApiResponse(responseCode = "400", description = "Datos de pago inválidos, monto insuficiente o excesivo, o factura no existente.")
     })
+    /** Maneja la solicitud POST para registrar un pago.
+     * @param pagoDTO Objeto PagoDTO con los detalles del pago a registrar
+     * @return ResponseEntity con la factura actualizada o error.
+     */
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarPago(@RequestBody PagoDTO pagoDTO) {
         try {

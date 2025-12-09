@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-
+/**
+ * Entidad que representa un pago realizado mediante cheque bancario.
+ * Hereda campos comunes de MedioDePago.
+ */
 @Entity
 @Table(name = "cheque", schema = "pruebabdd")
 @Data

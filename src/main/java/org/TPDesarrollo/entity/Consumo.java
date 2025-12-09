@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
-
+/**
+ * Entidad que representa un consumo o cargo adicional dentro de una estadía.
+ * Incluye detalles como descripción, precio unitario, cantidad y fecha del consumo.
+ */
 @Entity
 @Table(name = "consumo", schema = "pruebabdd")
 @Data

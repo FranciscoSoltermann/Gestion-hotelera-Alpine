@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
+/**
+ * Entidad que representa a un individuo (persona física) responsable de pagar una factura.
+ * Hereda campos comunes de ResponsableDePago.
+ */
 @Entity
 @Table(name = "persona_fisica", schema = "pruebabdd")
 @Data

@@ -11,7 +11,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * DTO para crear una nueva reserva o registrar una ocupación (Check-in).
+ * Contiene validaciones para asegurar la integridad de los datos.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -12,11 +12,22 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuración de OpenAPI para la documentación de la API REST.
+ * Define un esquema de seguridad para autenticación básica HTTP
+ * y respuestas de error comunes para estandarizar la documentación.
+ * Las respuestas de error definidas aquí pueden ser referenciadas
+ * en los controladores para mantener la consistencia.
+ */
 @Configuration
 public class OpenApiConfig {
 
     private static final String BASIC_AUTH_SECURITY_SCHEME = "basicAuth";
 
+    /**
+     * Configuración personalizada de OpenAPI para la documentación de la API.
+     * @return OpenAPI configurada con información del API, esquema de seguridad y respuestas de error comunes.
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -33,7 +44,10 @@ public class OpenApiConfig {
                 // Aplicar el esquema de seguridad globalmente a todos los endpoints
                 .addSecurityItem(new SecurityRequirement().addList(BASIC_AUTH_SECURITY_SCHEME));
     }
-
+    /**
+     * Crea un esquema de seguridad para autenticación básica HTTP.
+     * @return SecurityScheme configurada para autenticación básica.
+     */
     private SecurityScheme createBasicSecurityScheme() {
         return new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP)
@@ -44,6 +58,10 @@ public class OpenApiConfig {
 
     // --- Definiciones de Respuestas de Error Comunes (para referenciar en Controladores) ---
 
+    /**
+     * Crea una respuesta de error 400 Bad Request.
+     * @return ApiResponse configurada para errores de petición incorrecta.
+     */
     private ApiResponse createBadRequestResponse() {
         return new ApiResponse()
                 .description("400: Petición incorrecta, error de validación (Jakarta Validation) o regla de negocio fallida.")
@@ -51,11 +69,19 @@ public class OpenApiConfig {
                         new MediaType().schema(new Schema<String>().example("{\"error\": \"Mensaje de error del Gestor\"}"))));
     }
 
+    /**
+     * Crea una respuesta de error 404 Not Found.
+     * @return ApiResponse configurada para recursos no encontrados.
+     */
     private ApiResponse createNotFoundResponse() {
         return new ApiResponse()
                 .description("404: Recurso no encontrado (ej: ID, DNI o CUIT no existe en la base de datos).");
     }
 
+    /**
+     * Crea una respuesta de error 500 Internal Server Error.
+     * @return ApiResponse configurada para errores internos del servidor.
+     */
     private ApiResponse createInternalErrorResponse() {
         return new ApiResponse()
                 .description("500: Error inesperado del servidor (excepción no controlada).");

@@ -10,7 +10,10 @@ import lombok.experimental.SuperBuilder;
 import org.TPDesarrollo.enums.RazonSocial;
 
 import java.time.LocalDate;
-
+/**
+ * Entidad que representa a un huésped o cliente registrado.
+ * Hereda datos básicos de Persona.
+ */
 @Entity
 @Table(name = "huesped", schema = "pruebabdd")
 @PrimaryKeyJoinColumn(name = "id_persona")

@@ -12,7 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-
+/**
+ * Implementación del gestor de pagos.
+ * Proporciona funcionalidades para registrar pagos y obtener facturas pendientes con saldo.
+ */
 @Service
 @RequiredArgsConstructor
 public class GestorPagoImp implements GestorPago{
@@ -21,7 +24,12 @@ public class GestorPagoImp implements GestorPago{
     private final PagoRepository pagoRepository;
     private final MedioDePagoRepository medioDePagoRepository;
     private final BancoRepository bancoRepository;
-
+    /**
+     * Registra un pago para una factura específica.
+     *
+     * @param dto El DTO que contiene la información del pago.
+     * @return La factura actualizada después del registro del pago.
+     */
     @Transactional
     public Factura registrarPago(PagoDTO dto) {
         Factura factura = facturaRepository.findById((long) Math.toIntExact(dto.getIdFactura()))
@@ -49,7 +57,12 @@ public class GestorPagoImp implements GestorPago{
 
         return factura;
     }
-
+    /**
+     * Obtiene una lista de facturas pendientes con saldo para una habitación específica.
+     *
+     * @param habitacion El número de la habitación.
+     * @return Una lista de facturas pendientes con su saldo pendiente calculado.
+     */
     @Transactional(readOnly = true)
     public List<Factura> obtenerPendientesConSaldo(String habitacion) {
         List<Factura> pendientes = facturaRepository.findByEstadia_Habitacion_NumeroAndEstado(
@@ -66,7 +79,12 @@ public class GestorPagoImp implements GestorPago{
 
         return pendientes;
     }
-
+    /**
+     * Crea un medio de pago basado en la información proporcionada en el DTO.
+     *
+     * @param dto El DTO que contiene la información del medio de pago.
+     * @return El medio de pago creado.
+     */
     private MedioDePago crearMedioDePago(PagoDTO dto) {
         return switch (dto.getTipoMedioPago().toUpperCase()) {
             case "EFECTIVO" -> Efectivo.builder()
@@ -94,7 +112,11 @@ public class GestorPagoImp implements GestorPago{
             default -> throw new RuntimeException("Medio de pago no soportado: " + dto.getTipoMedioPago());
         };
     }
-
+    /**
+     * Valida y actualiza el estado de una factura si el total pagado cubre el monto total.
+     *
+     * @param factura La factura a validar.
+     */
     private void validarEstadoFactura(Factura factura) {
         List<Pago> pagos = pagoRepository.findByFactura(factura);
 

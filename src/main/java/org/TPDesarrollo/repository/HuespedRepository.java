@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.TPDesarrollo.enums.TipoDocumento;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 /**
@@ -14,6 +16,7 @@ import java.util.List;
  * Incluye consultas para verificar la existencia de huéspedes por CUIT y documento,
  * así como para buscar huéspedes según varios criterios.
  */
+@Repository
 public interface HuespedRepository extends JpaRepository<Huesped, Integer> {
     boolean existsByCuit(String cuit);
     boolean existsByDocumento(String documento);

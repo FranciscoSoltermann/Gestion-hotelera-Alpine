@@ -8,7 +8,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+/**
+ * Entidad que representa a un individuo que está ocupando físicamente una habitación.
+ * Hereda datos básicos de la clase Persona.
+ */
 @Entity
 @Table(name = "ocupante", schema = "pruebabdd")
 @PrimaryKeyJoinColumn(name = "id_persona")

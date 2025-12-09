@@ -1,4 +1,4 @@
-package org.TPDesarrollo.validaciones;
+package org.TPDesarrollo.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -14,7 +14,12 @@ import java.util.List;
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
 
     @Override
-    // Método principal de validación
+    /** Valida la contraseña según las reglas definidas.
+     *
+     * @param password La contraseña a validar.
+     * @param context  El contexto de validación.
+     * @return true si la contraseña es válida, false en caso contrario.
+     */
     public boolean isValid(String password, ConstraintValidatorContext context) {
         if (password == null || password.isEmpty()) {
             return false; // Puedes usar @NotBlank para esto, pero es bueno tenerlo
@@ -68,7 +73,11 @@ public class PasswordConstraintValidator implements ConstraintValidator<ValidPas
         return true;
     }
 
-    // Método auxiliar para establecer mensajes de error personalizados
+    /** Establece un mensaje de error personalizado en el contexto de validación.
+     *
+     * @param context El contexto de validación.
+     * @param message El mensaje de error a establecer.
+     */
     private void setErrorMessage(ConstraintValidatorContext context, String message) {
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(message).addConstraintViolation();

@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-
+/**
+ * Implementación del servicio GestorConsumo.
+ * Proporciona la funcionalidad para cargar consumos asociados a estadías de habitaciones.
+ */
 @Service
 @RequiredArgsConstructor
 public class GestorConsumoImp implements GestorConsumo {
@@ -21,7 +24,12 @@ public class GestorConsumoImp implements GestorConsumo {
     private final EstadiaRepository estadiaRepository;
     private final ConsumoRepository consumoRepository;
     private final HabitacionRepository habitacionRepository;
-
+    /**
+     * Carga un consumo asociado a la estadía activa de una habitación.
+     *
+     * @param dto El DTO que contiene los datos del consumo a cargar.
+     * @throws RuntimeException Si la habitación no existe o no tiene una estadía activa.
+     */
     @Override
     @Transactional
     public void cargarConsumo(CargaConsumoDTO dto) {

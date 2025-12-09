@@ -17,14 +17,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ Implementación del servicio GestorHabitacion para gestionar el estado de las habitaciones.
+*/
 @Service
 public class GestorHabitacionImp implements GestorHabitacion {
 
     private final HabitacionRepository habitacionRepository;
     private final ReservaRepository reservaRepository;
     private final HabitacionMapper habitacionMapper;
-
+    /**
+     * Constructor que inyecta los repositorios y el mapper necesarios.
+     *
+     * @param habitacionRepository Repositorio de Habitaciones.
+     * @param reservaRepository    Repositorio de Reservas.
+     * @param habitacionMapper     Mapper para convertir entre entidades y DTOs.
+     */
     @Autowired
     public GestorHabitacionImp(HabitacionRepository habitacionRepository,
                                ReservaRepository reservaRepository,
@@ -33,7 +41,13 @@ public class GestorHabitacionImp implements GestorHabitacion {
         this.reservaRepository = reservaRepository;
         this.habitacionMapper = habitacionMapper;
     }
-
+    /**
+     * Obtiene el estado de las habitaciones en un rango de fechas.
+     *
+     * @param fechaDesde Fecha de inicio del rango.
+     * @param fechaHasta Fecha de fin del rango.
+     * @return Lista de GrillaHabitacionDTO con el estado de cada habitación por día.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<GrillaHabitacionDTO> obtenerEstadoHabitaciones(LocalDate fechaDesde, LocalDate fechaHasta) {

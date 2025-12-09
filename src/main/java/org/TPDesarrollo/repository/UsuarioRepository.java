@@ -12,6 +12,19 @@ import java.util.Optional;
  */
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    /**
+     * Busca un usuario por su nombre y contraseña.
+     *
+     * @param nombre      El nombre del usuario.
+     * @param contrasenia La contraseña del usuario.
+     * @return Un Optional que contiene el usuario si se encuentra, o vacío si no.
+     */
     Optional<Usuario> findByNombreAndContrasenia(String nombre, String contrasenia);
+    /**
+     * Busca un usuario por su nombre.
+     *
+     * @param nombre El nombre del usuario a buscar.
+     * @return Un Optional que contiene el usuario si se encuentra, o vacío si no.
+     */
     Optional<Usuario> findByNombre(String nombre);
 }

@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * DTO que representa a un ocupante específico dentro de una habitación.
+ * Contiene validaciones para asegurar la integridad de los datos.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

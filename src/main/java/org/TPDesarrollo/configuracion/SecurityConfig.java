@@ -22,11 +22,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /**
+     * Configura el codificador de contraseñas utilizando BCrypt.
+     * @return Una instancia de PasswordEncoder que utiliza BCrypt para el hashing de contraseñas.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configura la cadena de filtros de seguridad para la aplicación.
+     * @return La configuración de SecurityFilterChain que define las reglas de seguridad.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http

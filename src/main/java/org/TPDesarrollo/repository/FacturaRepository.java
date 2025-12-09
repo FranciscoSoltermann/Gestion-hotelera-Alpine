@@ -8,10 +8,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+/**
+ * Repositorio para la entidad Factura.
+ * Proporciona métodos para realizar operaciones CRUD y consultas personalizadas en la base de datos.
+ */
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
-
+    /**
+     * Busca facturas por el número de habitación asociado a la estadía y el estado de la factura.
+     *
+     * @param numero El número de la habitación.
+     * @param estado El estado de la factura.
+     * @return Una lista de facturas que coinciden con los criterios especificados.
+     */
     @Query("SELECT f FROM Factura f " +
             "JOIN FETCH f.estadia e " +
             "JOIN FETCH e.habitacion h " +
@@ -22,7 +31,13 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
             @Param("estado") EstadoFactura estado
     );
 
-
+    /**
+     * Busca facturas activas (no anuladas) por el documento del responsable de pago,
+     * que puede ser un DNI para personas físicas o un CUIT para personas jurídicas.
+     *
+     * @param documento El documento del responsable de pago (DNI o CUIT).
+     * @return Una lista de facturas activas asociadas al documento proporcionado.
+     */
     @Query("SELECT f FROM Factura f " +
             "JOIN FETCH f.responsableDePago r " +
             "WHERE (TREAT(r AS PersonaFisica).dni = :documento " +  // <-- Usamos TREAT para acceder a propiedades de la subclase

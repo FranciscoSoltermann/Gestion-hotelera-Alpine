@@ -3,7 +3,9 @@ package org.TPDesarrollo.service;
 import org.TPDesarrollo.dto.GrillaHabitacionDTO;
 import java.time.LocalDate;
 import java.util.List;
-
+/**
+ * Interfaz para la gestión de habitaciones.
+ */
 public interface GestorHabitacion {
 
     /**

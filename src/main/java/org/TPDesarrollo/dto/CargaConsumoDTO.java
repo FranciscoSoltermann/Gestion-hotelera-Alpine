@@ -3,7 +3,10 @@ package org.TPDesarrollo.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-
+/**
+ * DTO para cargar consumos asociados a una habitación.
+ * Contiene validaciones para asegurar la integridad de los datos.
+ */
 @Data
 public class CargaConsumoDTO {
 

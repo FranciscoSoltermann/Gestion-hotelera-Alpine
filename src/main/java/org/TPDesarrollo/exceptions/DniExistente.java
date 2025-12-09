@@ -5,6 +5,9 @@ package org.TPDesarrollo.exceptions;
  * Se lanza cuando se intenta registrar un cliente con un DNI que ya está registrado.
  */
 public class DniExistente extends RuntimeException {
+    /**
+     * Constructor de la excepción DniExistente.
+     */
     public DniExistente(String message) {
         super(message);
     }

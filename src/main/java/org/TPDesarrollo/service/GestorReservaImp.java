@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+/**
+ * Implementación del servicio GestorReserva.
+ * Proporciona la funcionalidad para crear, ocupar y eliminar reservas de habitaciones.
+ */
 @Service
 @RequiredArgsConstructor
 public class GestorReservaImp implements GestorReserva {
@@ -28,20 +31,30 @@ public class GestorReservaImp implements GestorReserva {
     private final ReservaRepository reservaRepository;
     private final HuespedRepository huespedRepository;
     private final EstadiaRepository estadiaRepository;
-
+    /**
+     * Crea una nueva reserva de habitación.
+     *
+     * @param dto El DTO que contiene los datos de la reserva a crear.
+     * @return Una lista de reservas creadas.
+     */
     @Override
     @Transactional
     public List<Reserva> crearReserva(ReservaDTO dto) {
         return procesarReserva(dto, "RESERVADA");
     }
-
+    /**
+     * Marca una reserva existente como ocupada.
+     *
+     * @param dto El DTO que contiene los datos de la reserva a ocupar.
+     * @return Una lista de reservas actualizadas a estado ocupada.
+     */
     @Override
     @Transactional
     public List<Reserva> crearOcupacion(ReservaDTO dto) {
         return procesarReserva(dto, "OCUPADA");
     }
 
-    // --- ELIMINAR POR ID DIRECTO (Si se tiene el ID) ---
+    /** LÓGICA PARA ELIMINAR RESERVA DESDE DETALLE DE RESERVA */
     @Override
     @Transactional
     public void eliminarReserva(Integer id) throws Exception {
@@ -54,7 +67,7 @@ public class GestorReservaImp implements GestorReserva {
         reservaRepository.delete(reserva);
     }
 
-    // --- LÓGICA CORREGIDA PARA ELIMINAR DESDE LA GRILLA ---
+    /** LÓGICA PARA ELIMINAR RESERVA DESDE CALENDARIO */
     @Override
     @Transactional
     public void cancelarReservaPorFecha(Integer idHabitacion, LocalDate fecha) throws Exception {
@@ -70,7 +83,13 @@ public class GestorReservaImp implements GestorReserva {
         // La query del repositorio ya filtra que el estado sea 'RESERVADA', así que borramos directo.
         reservaRepository.delete(reservaAEliminar);
     }
-
+    /**
+     * Procesa la creación o actualización de una reserva.
+     *
+     * @param dto        El DTO que contiene los datos de la reserva.
+     * @param estadoNuevo El nuevo estado de la reserva (RESERVADA u OCUPADA).
+     * @return Una lista de reservas procesadas.
+     */
     private List<Reserva> procesarReserva(ReservaDTO dto, String estadoNuevo) {
         if (dto.getIngreso().isAfter(dto.getEgreso())) {
             throw new IllegalArgumentException("La fecha de ingreso debe ser anterior al egreso");
@@ -160,7 +179,12 @@ public class GestorReservaImp implements GestorReserva {
         }
         return reservasGuardadas;
     }
-
+    /**
+     * Obtiene un huésped por documento o lo crea si no existe.
+     *
+     * @param datos Los datos del huésped.
+     * @return El huésped existente o recién creado.
+     */
     private Huesped obtenerOGuardarHuesped(ReservaDTO.DatosHuespedReserva datos) {
         Huesped huesped = huespedRepository.findByDocumento(datos.getDocumento());
         if (huesped == null) {

@@ -8,7 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-
+/**
+ * DTO que representa una línea de detalle dentro de una factura,
+ * como puede ser el costo de estadía, minibar, servicios adicionales, etc.
+ */
 @Data
 @Builder
 @Schema(description = "Representa una línea de detalle dentro de una factura (costo de estadía, minibar, servicio).")

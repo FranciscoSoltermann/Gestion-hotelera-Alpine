@@ -13,6 +13,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ModelMapperConfig {
 
+    /**
+     * Configura y proporciona una instancia de ModelMapper con las siguientes características:
+     * Estrategia de coincidencia STRICT para asegurar que los nombres de los
+     * campos de origen y destino coincidan exactamente.
+     * Habilita el Field Matching y el acceso a campos privados, esencial cuando se usa Lombok (@Data).
+     * @return una instancia configurada de ModelMapper.
+     */
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();

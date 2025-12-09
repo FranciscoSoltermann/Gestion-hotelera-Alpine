@@ -6,7 +6,10 @@ import lombok.*;
 import org.TPDesarrollo.enums.TipoMoneda;
 
 import java.time.LocalDate;
-
+/**
+ * Entidad que registra una transacción de cobro,
+ * vinculando una factura con un método de pago y especificando la moneda.
+ */
 @Entity
 @Table(name = "pago", schema = "pruebabdd")
 @Data

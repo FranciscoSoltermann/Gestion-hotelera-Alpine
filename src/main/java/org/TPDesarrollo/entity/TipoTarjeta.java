@@ -11,7 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * Entidad de catálogo que define el tipo de tarjeta (ej: Visa, Mastercard, American Express).
+ */
 @Entity
 @Table(name = "tipo_tarjeta", schema = "pruebabdd")
 @Data

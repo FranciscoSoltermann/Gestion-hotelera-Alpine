@@ -15,14 +15,22 @@ import org.springframework.transaction.annotation.Transactional;
  * Implementación de la interfaz GestorUsuario.
  * Contiene la lógica real.
  */
-@Service // ¡IMPORTANTE! La anotación @Service va en la implementación
-@RequiredArgsConstructor // Usamos Lombok para inyectar dependencias (más limpio)
+@Service
+@RequiredArgsConstructor
 public class GestorUsuarioImp implements GestorUsuario {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Override // Indica que estamos cumpliendo el contrato de la interfaz
+    /**
+     * Autentica un usuario basado en su nombre y contraseña.
+     *
+     * @param nombre     El nombre del usuario.
+     * @param contrasenia La contraseña del usuario.
+     * @return El usuario autenticado.
+     * @throws UsuarioNoEncontrado Si el usuario no existe.
+     * @throws ContraseniaInvalida Si la contraseña es incorrecta.
+     */
+    @Override
     @Transactional(readOnly = true)
     public Usuario autenticarUsuario(String nombre, String contrasenia) throws UsuarioNoEncontrado, ContraseniaInvalida {
 
@@ -37,7 +45,13 @@ public class GestorUsuarioImp implements GestorUsuario {
 
         return usuarioAlmacenado;
     }
-
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * @param datos Los datos del usuario a registrar.
+     * @return El usuario registrado.
+     * @throws UsuarioExistente Si el nombre de usuario ya existe.
+     */
     @Override
     @Transactional
     public Usuario registrarUsuario(UsuarioDTO datos) {

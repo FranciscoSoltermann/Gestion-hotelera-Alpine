@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import org.TPDesarrollo.enums.EstadoHabitacion;
 
 import java.time.LocalDate;
-
+/**
+ * Clase base que define los atributos comunes de todas las habitaciones.
+ * Utiliza la estrategia de herencia JOINED.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "habitacion", schema = "pruebabdd")

@@ -34,15 +34,28 @@ import java.util.Map;
 public class FacturaControlador {
 
     private final GestorFactura gestorFactura;
-
+    /**
+     * Endpoint para previsualizar el detalle de facturación de una habitación.
+     * @param habitacion Número de la habitación a facturar.
+     * @param horaSalida Hora estimada de salida para cálculo de medios días (Formato HH:mm).
+     * @return Respuesta HTTP con el resumen de facturación o error en la operación.
+     */
     @Operation(
             summary = "Previsualizar detalle de facturación",
             description = "Calcula los costos de estadía hasta la hora de salida indicada, suma los consumos pendientes y lista los posibles responsables de pago sin cerrar la estadía."
     )
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Resumen generado exitosamente (Items, Subtotales, Ocupantes)"),
             @ApiResponse(responseCode = "400", description = "Error de validación (Formato de hora inválido, habitación sin ocupantes activos)")
     })
+
+    /**
+     * Maneja la solicitud GET para previsualizar la factura.
+     * @param habitacion Número de la habitación a facturar.
+     * @param horaSalida Hora estimada de salida para cálculo de medios días (Formato HH:mm).
+     * @return ResponseEntity con el resumen de facturación o error.
+     */
     @GetMapping("/previsualizar")
     public ResponseEntity<?> previsualizarFactura(
             @Parameter(description = "Número de la habitación a facturar", example = "105")
@@ -59,7 +72,11 @@ public class FacturaControlador {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-
+    /**
+     * Endpoint para crear y emitir una factura oficial.
+     * @param solicitud Datos necesarios para generar la factura.
+     * @return Respuesta HTTP con la factura creada o error en la operación.
+     */
     @Operation(
             summary = "Crear y emitir factura",
             description = "Genera la factura oficial, asocia los items seleccionados, asigna el responsable de pago (Huésped o Tercero) y persiste la transacción."
@@ -68,6 +85,11 @@ public class FacturaControlador {
             @ApiResponse(responseCode = "200", description = "Factura creada y guardada correctamente"),
             @ApiResponse(responseCode = "400", description = "Error al procesar (Falta responsable de pago, estadía ya facturada, datos inconsistentes)")
     })
+    /**
+     * Maneja la solicitud POST para crear una factura.
+     * @param solicitud Objeto SolicitudFacturaDTO con los detalles para generar la factura
+     * @return ResponseEntity con la factura creada o error
+     */
     @PostMapping("/crear")
     public ResponseEntity<?> crearFactura(@RequestBody SolicitudFacturaDTO solicitud) {
         try {
@@ -78,11 +100,20 @@ public class FacturaControlador {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Error al facturar: " + e.getMessage()));
         }
     }
-
+    /**
+     * Endpoint para buscar facturas asociadas a un cliente por su documento (DNI/CUIT).
+     * @param documento Documento del cliente para buscar facturas.
+     * @return Respuesta HTTP con la lista de facturas encontradas o error en la operación.
+     */
     @Operation(
             summary = "Buscar facturas por cliente (DNI/CUIT)",
             description = "Devuelve una lista de facturas pendientes/pagadas (no anuladas) asociadas a un documento."
     )
+    /**
+     * Maneja la solicitud GET para buscar facturas por documento de cliente.
+     * @param documento Documento del cliente para buscar facturas
+     * @return ResponseEntity con la lista de facturas encontradas o error
+     */
     @GetMapping("/buscar-por-cliente")
     public ResponseEntity<?> buscarFacturasPorCliente(@RequestParam String documento) {
         try {
@@ -95,11 +126,20 @@ public class FacturaControlador {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-
+    /**
+     * Endpoint para generar una Nota de Crédito que anula una o varias facturas.
+     * @param solicitud Datos necesarios para generar la Nota de Crédito.
+     * @return Respuesta HTTP con la Nota de Crédito creada o error en la operación.
+     */
     @Operation(
             summary = "Generar Nota de Crédito",
             description = "Anula una o varias facturas seleccionadas y genera el comprobante de nota de crédito."
     )
+    /**
+     * Maneja la solicitud POST para crear una Nota de Crédito.
+     * @param solicitud Objeto SolicitudNotaCreditoDTO con los detalles para generar la Nota de Crédito
+     * @return ResponseEntity con la Nota de Crédito creada o error
+     */
     @PostMapping("/nota-credito")
     public ResponseEntity<?> crearNotaCredito(@RequestBody @Valid SolicitudNotaCreditoDTO solicitud) {
         try {

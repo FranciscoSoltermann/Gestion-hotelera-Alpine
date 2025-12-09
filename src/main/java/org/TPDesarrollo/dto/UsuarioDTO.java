@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.TPDesarrollo.validaciones.ValidPassword;
+import org.TPDesarrollo.validation.ValidPassword;
 
 /**
  * DTO utilizado para el inicio de sesión y el registro de usuarios en el sistema.

@@ -13,7 +13,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.TPDesarrollo.enums.EstadoFactura;
 import org.TPDesarrollo.enums.TipoFactura;
-
+/**
+ * Entidad que representa una factura emitida, registrando el monto total y el responsable de pago.
+ */
 @Entity
 @Table(name = "factura")
 @Data

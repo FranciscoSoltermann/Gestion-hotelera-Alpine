@@ -5,7 +5,9 @@ package org.TPDesarrollo.exceptions;
  * Indica que el alta del CUIT no fue realizada debido a su existencia previa.
  */
 public class CuitExistente extends RuntimeException {
-    // Constructor
+    /**
+     * Constructor de la excepción CuitExistente.
+     */
     public CuitExistente(String cuit) {
         super("El CUIT " + cuit + " ya se encuentra registrado en el sistema. El alta no fue realizada.");
     }

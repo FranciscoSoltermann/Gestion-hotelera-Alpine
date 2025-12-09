@@ -17,6 +17,10 @@ import java.util.List;
 
 /**
  * Controlador REST para gestionar las habitaciones y sus estados.
+ * Proporciona endpoints para consultar la disponibilidad y el estado de las habitaciones
+ * en un rango de fechas específico.
+ * Utiliza GestorHabitacion para la lógica de negocio.
+ * Maneja excepciones para proporcionar respuestas adecuadas en caso de errores.
  */
 @RestController
 @RequestMapping("/api/habitaciones")
@@ -26,11 +30,19 @@ public class HabitacionControlador {
 
     private final GestorHabitacion gestorHabitacion;
 
+    /**
+     * Constructor del controlador de habitaciones.
+     */
     @Autowired
     public HabitacionControlador(GestorHabitacion gestorHabitacion) {
         this.gestorHabitacion = gestorHabitacion;
     }
-
+    /**
+     * Endpoint para obtener el estado de todas las habitaciones en un rango de fechas.
+     * @param fechaDesde Fecha de inicio del rango (Formato ISO: YYYY-MM-DD).
+     * @param fechaHasta Fecha de fin del rango (Formato ISO: YYYY-MM-DD).
+     * @return Respuesta HTTP con la lista de estados de habitaciones o error en la operación.
+     */
     @Operation(
             summary = "Obtener Matriz de Disponibilidad",
             description = "Devuelve el estado (Disponible, Ocupada, Reservada, Mantenimiento) de todas las habitaciones para un rango de fechas. Utilizado para la grilla de recepción."
@@ -40,6 +52,12 @@ public class HabitacionControlador {
             @ApiResponse(responseCode = "400", description = "Error en la validación de fechas (ej: rango inválido)."),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor al consultar la base de datos.")
     })
+    /**
+     * Maneja la solicitud GET para obtener el estado de las habitaciones.
+     * @param fechaDesde Fecha de inicio del rango (Formato ISO: YYYY-MM-DD).
+     * @param fechaHasta Fecha de fin del rango (Formato ISO: YYYY-MM-DD).
+     * @return ResponseEntity con la lista de estados de habitaciones o error.
+     */
     @GetMapping("/estado")
     public ResponseEntity<?> obtenerEstado(
             @Parameter(description = "Fecha de inicio del rango (Formato ISO: YYYY-MM-DD)", example = "2025-01-01")

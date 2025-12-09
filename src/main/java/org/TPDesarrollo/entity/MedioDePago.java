@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
+/**
+ * Clase base abstracta para todos los métodos de pago (Efectivo, Cheque, Tarjeta).
+ * Usa la estrategia de herencia JOINED.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "medio_de_pago", schema = "pruebabdd")

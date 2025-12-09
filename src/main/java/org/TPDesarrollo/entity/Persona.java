@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.TPDesarrollo.enums.TipoDocumento;
-
+/**
+ * Clase base abstracta que define los atributos comunes a cualquier persona (Huésped, Empleado, etc.).
+ * Utiliza la estrategia de herencia JOINED.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "persona", schema = "pruebabdd")

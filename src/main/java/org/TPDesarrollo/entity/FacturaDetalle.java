@@ -14,7 +14,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * Entidad que representa una línea de detalle o ítem dentro de una Factura.
+ */
 @Entity
 @Table(name = "factura_detalles")
 @Data

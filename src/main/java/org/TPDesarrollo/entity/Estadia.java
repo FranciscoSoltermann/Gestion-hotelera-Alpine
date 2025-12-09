@@ -10,7 +10,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+/**
+ * Entidad que representa una estadía en el hotel.
+ * Registra el período de ocupación real de una habitación por parte de un huésped (Check-in a Check-out).
+ */
 @Entity
 @Table(name = "estadia", schema = "pruebabdd")
 @Data

@@ -7,6 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Clase base abstracta que define los atributos comunes para toda entidad
+ * (Persona Física o Jurídica) responsable de abonar una Factura.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "responsable_pago", schema = "pruebabdd")

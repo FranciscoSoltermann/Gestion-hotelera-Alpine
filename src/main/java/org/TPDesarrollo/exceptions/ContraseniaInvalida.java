@@ -6,7 +6,9 @@ package org.TPDesarrollo.exceptions;
  * de seguridad o formato esperado.
  */
 public class ContraseniaInvalida extends Exception {
-    // Constructor
+    /**
+     * Constructor de la excepción con un mensaje personalizado.
+     */
     public ContraseniaInvalida(String message) {
         super(message);
     }

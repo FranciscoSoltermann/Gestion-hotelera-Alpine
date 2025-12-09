@@ -11,7 +11,10 @@ import org.TPDesarrollo.enums.RazonSocial;
 import org.TPDesarrollo.enums.TipoDocumento;
 
 import java.time.LocalDate;
-
+/**
+ * DTO que representa los datos personales y de contacto de un Huésped.
+ * Contiene validaciones para asegurar la integridad de los datos.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

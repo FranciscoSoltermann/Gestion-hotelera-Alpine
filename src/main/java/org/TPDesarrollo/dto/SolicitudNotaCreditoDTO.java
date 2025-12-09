@@ -5,7 +5,10 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.List;
-
+/**
+ * DTO para solicitar la creación de una Nota de Crédito.
+ * Contiene una lista de IDs de facturas que se desean anular.
+ */
 @Data
 @Schema(description = "DTO para solicitar la creación de una Nota de Crédito.")
 public class SolicitudNotaCreditoDTO {

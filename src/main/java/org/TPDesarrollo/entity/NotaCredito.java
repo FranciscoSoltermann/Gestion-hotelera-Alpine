@@ -7,7 +7,9 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Entidad que representa una Nota de Crédito emitida para anular o compensar facturas existentes.
+ */
 @Entity
 @Table(name = "nota_credito", schema = "pruebabdd")
 @Data

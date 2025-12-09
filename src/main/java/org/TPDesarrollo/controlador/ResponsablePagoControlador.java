@@ -15,7 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-
+/**
+ * Controlador REST para la gestión de responsables de pago (entidades jurídicas).
+ * Proporciona endpoints para crear y buscar responsables de pago.
+ * Utiliza ResponsableDePagoRepository para la lógica de acceso a datos.
+ * Maneja excepciones para proporcionar respuestas adecuadas en caso de errores.
+ */
 @RestController
 @RequestMapping("/api/responsables")
 @RequiredArgsConstructor
@@ -23,7 +28,11 @@ import java.util.Optional;
 public class ResponsablePagoControlador {
 
     private final ResponsableDePagoRepository responsableRepository;
-
+    /**
+     * Endpoint para crear un nuevo responsable jurídico (empresa).
+     * @param dto Datos del responsable de pago a registrar.
+     * @return Respuesta HTTP con el responsable creado o error en la operación.
+     */
     @Operation(
             summary = "Crear nuevo Responsable Jurídico (Empresa)",
             description = "Da de alta una Persona Jurídica (Empresa) como responsable de pago. Requiere validación previa para evitar CUIT duplicados."
@@ -33,6 +42,11 @@ public class ResponsablePagoControlador {
             @ApiResponse(responseCode = "400", description = "Datos inválidos o el CUIT ya se encuentra registrado."),
             @ApiResponse(responseCode = "500", description = "Error interno al procesar la dirección o guardar la entidad.")
     })
+    /**
+     * Maneja la solicitud POST para crear un nuevo responsable jurídico.
+     * @param dto Objeto ResponsableDePagoDTO con los detalles del responsable a registrar
+     * @return ResponseEntity con el responsable creado o error.
+     */
     @PostMapping("/crear-juridica")
     public ResponseEntity<?> crearResponsableJuridico(@RequestBody ResponsableDePagoDTO dto) {
         try {
@@ -75,7 +89,11 @@ public class ResponsablePagoControlador {
             return ResponseEntity.badRequest().body(errorResponse);
         }
     }
-
+    /**
+     * Endpoint para buscar un responsable jurídico por su CUIT.
+     * @param cuit Número de CUIT a buscar.
+     * @return Respuesta HTTP con los datos del responsable encontrado o 404 si no existe.
+     */
     @Operation(
             summary = "Buscar responsable por CUIT",
             description = "Busca una entidad jurídica existente por su número de CUIT. Utilizado en la interfaz de facturación a terceros."
@@ -84,6 +102,10 @@ public class ResponsablePagoControlador {
             @ApiResponse(responseCode = "200", description = "Responsable encontrado. Retorna los datos principales."),
             @ApiResponse(responseCode = "404", description = "CUIT no registrado en la base de datos.")
     })
+    /** Maneja la solicitud GET para buscar un responsable por CUIT.
+     * @param cuit Número de CUIT a buscar
+     * @return ResponseEntity con los datos del responsable encontrado o 404 si no existe.
+     */
     @GetMapping("/buscar-cuit")
     public ResponseEntity<?> buscarPorCuit(
             @Parameter(description = "Número de CUIT a buscar", example = "30123456789")

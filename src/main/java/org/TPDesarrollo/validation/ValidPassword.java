@@ -1,4 +1,4 @@
-package org.TPDesarrollo.validaciones;
+package org.TPDesarrollo.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

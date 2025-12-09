@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * Entidad de catálogo que representa un Banco.
+ * Utilizado para registrar pagos con cheque.
+ */
 @Entity
 @Table(name = "banco", schema = "pruebabdd")
 @Data

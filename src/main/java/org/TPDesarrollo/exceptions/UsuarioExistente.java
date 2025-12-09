@@ -6,6 +6,8 @@ package org.TPDesarrollo.exceptions;
  * Contiene un constructor que acepta un mensaje de error personalizado.
  */
 public class UsuarioExistente extends RuntimeException {
+    /** Constructor que acepta un mensaje de error personalizado.
+     */
     public UsuarioExistente(String message) {
         super(message);
     }

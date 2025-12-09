@@ -3,7 +3,9 @@ package org.TPDesarrollo.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
-
+/**
+ * Entidad que almacena las credenciales de un usuario para autenticación y autorización.
+ */
 @Entity
 @Table(name = "usuario", schema = "pruebabdd")
 @Getter

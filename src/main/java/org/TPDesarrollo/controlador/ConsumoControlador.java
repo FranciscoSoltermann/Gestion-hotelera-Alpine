@@ -29,6 +29,11 @@ public class ConsumoControlador {
 
     private final GestorConsumoImp gestorConsumo;
 
+    /**
+     * Endpoint para cargar un consumo a la cuenta corriente de una habitación.
+     * @param dto Datos del consumo a registrar (habitacionId, descripcion, monto).
+     * @return Respuesta HTTP indicando éxito o error en la operación.
+     */
     @Operation(
             summary = "Cargar un consumo a una habitación",
             description = "Registra un ítem (producto o servicio) en la cuenta corriente de la estadía activa de una habitación específica."
@@ -37,6 +42,11 @@ public class ConsumoControlador {
             @ApiResponse(responseCode = "200", description = "Consumo registrado correctamente"),
             @ApiResponse(responseCode = "400", description = "Error de validación (Habitación vacía, no existe, o datos del consumo incorrectos)")
     })
+    /**
+     * Maneja la solicitud POST para cargar un consumo.
+     * @param dto Objeto CargaConsumoDTO con los detalles del consumo a registrar
+     * @return ResponseEntity con el resultado de la operación
+     */
     @PostMapping("/cargar")
     public ResponseEntity<?> cargarConsumo(@RequestBody CargaConsumoDTO dto) {
         try {

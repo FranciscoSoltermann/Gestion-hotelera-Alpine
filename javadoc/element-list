@@ -8,4 +8,4 @@ org.TPDesarrollo.enums
 org.TPDesarrollo.exceptions
 org.TPDesarrollo.service
 org.TPDesarrollo.repository
-org.TPDesarrollo.validaciones
+org.TPDesarrollo.validation
