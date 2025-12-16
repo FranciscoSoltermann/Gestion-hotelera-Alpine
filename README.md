@@ -33,6 +33,6 @@ Java JDK 21 o superior.
 
 Node.js (v18 o superior) y npm.
 
-PostgreSQL (corriendo localmente).
+PostgreSQL (corriendo en la nube).
 
 Maven (opcional, si no usas el wrapper mvnw).
