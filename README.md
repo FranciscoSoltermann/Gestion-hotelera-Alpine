@@ -29,10 +29,10 @@ JavaScript (ES6+)
 Prerrequisitos
 Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
-Java JDK 21 o superior.
+Java JDK 21.
 
 Node.js (v18 o superior) y npm.
 
 PostgreSQL (corriendo en la nube).
 
-Maven (opcional, si no usas el wrapper mvnw).
+Maven.
